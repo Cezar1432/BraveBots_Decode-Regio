@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.bravebots_decode.p2p_test.drivetrains;
+package org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains;
 
 import static java.lang.Math.atan2;
 import static java.lang.Math.hypot;
@@ -6,7 +6,7 @@ import static java.lang.Math.toDegrees;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.bravebots_decode.Robot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.useful.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.wrappers.BetterMotor;
@@ -51,9 +51,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
     public double r= hypot(wheelBase, trackWidth);
+    public void setWheelBase(double wheelBase){
+        this.wheelBase= wheelBase;
+    }
+    public void setTrackWidth(double trackWidth){
+        this.trackWidth= trackWidth;
+    }
+
 
     public class SwerveModule {
-        BetterMotor driveMotor;
+        public BetterMotor driveMotor;
         public BetterCRServo steeringServo;
 
         double targetSpeed = 0;
@@ -65,6 +72,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
         }
 
+
+        double speed;
         public void setState(double speed, double angle) {
             // Get current angle
             double currentAngle = steeringServo.getTruePosition() * 360.0;
@@ -74,7 +83,6 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             while (diff > 180) diff -= 360;
             while (diff < -180) diff += 360;
 
-            // If we need to turn more than 90 degrees, reverse drive and turn to opposite angle
             if (Math.abs(diff) > 90) {
                 diff = diff > 0 ? diff - 180 : diff + 180;
                 speed = -speed;
@@ -82,14 +90,14 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
             double targetAngle = currentAngle + diff;
 
-            if(Math.abs(diff) > 45)
-                speed= 0;
-            // Set steering angle and update
+//            if(Math.abs(diff) > 45)
+//                speed= 0;
+
             steeringServo.setAngle(targetAngle);
             steeringServo.update();
 
-            // Set drive speed
             driveMotor.setPower(speed);
+            this.speed= speed;
         }
 
         public double getCurrentAngle() {
@@ -99,6 +107,9 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
         public double getTargetAngle() {
             return steeringServo.getTargetPos() * 360.0;
+        }
+        public double getTargetPower(){
+            return this.speed;
         }
 
         public double getDriveSpeed() {
@@ -196,8 +207,9 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 //        }
 
         if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
+            r= hypot(wheelBase, trackWidth);
             rotation *= -1;
-            strafeY *= -1;
+            //strafeY *= -1;
             double a = strafeX + rotation * (wheelBase / r),
                     b = strafeX - rotation * (wheelBase / r),
                     c = strafeY + rotation * (trackWidth / r),

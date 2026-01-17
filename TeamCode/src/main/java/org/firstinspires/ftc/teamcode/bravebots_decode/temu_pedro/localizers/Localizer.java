@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.bravebots_decode.p2p_test.localizers;
+package org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.localizers;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
@@ -20,6 +20,7 @@ public interface Localizer {
         while(h< -Math.PI) h+= 2* Math.PI;
         return h;
     }
+    @Deprecated
     static double normalizeDegrees(double degrees){
         while(degrees> 180) degrees-= 360;
         while(degrees< -180) degrees+= 360;

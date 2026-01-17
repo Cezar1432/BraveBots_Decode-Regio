@@ -1,16 +1,16 @@
-package org.firstinspires.ftc.teamcode.bravebots_decode.p2p_test.localizers;
+package org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.localizers;
 
 
-import static org.firstinspires.ftc.teamcode.bravebots_decode.p2p_test.Constants.filterParameter;
-import static org.firstinspires.ftc.teamcode.bravebots_decode.p2p_test.Constants.xDeceleration;
-import static org.firstinspires.ftc.teamcode.bravebots_decode.p2p_test.Constants.yDeceleration;
+import static org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants.filterParameter;
+import static org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants.xDeceleration;
+import static org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants.yDeceleration;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
-import org.firstinspires.ftc.teamcode.bravebots_decode.Robot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.useful.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.math.LowPassFilter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.math.Pose;
 
