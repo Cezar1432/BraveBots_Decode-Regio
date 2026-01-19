@@ -138,7 +138,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         if(trackWidth== 0)
             throw new IllegalArgumentException("Track Width nesetat");
         if(wheelBase== 0)
-            throw new IllegalArgumentException());
+            throw new IllegalArgumentException("Wheel Base nesetat"));
         if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
             r= hypot(wheelBase, trackWidth);
             rotation *= -1.3;
