@@ -21,5 +21,10 @@ public class GamepadLimiter {
     public double getRightX(){
         return rightX.calculate(gp.right_stick_x);
     }
+    public void setLimiter(double limiter){
+        rightX.setLimiter(limiter);
+        leftY.setLimiter(limiter);
+        leftX.setLimiter(limiter);
+    }
 
 }

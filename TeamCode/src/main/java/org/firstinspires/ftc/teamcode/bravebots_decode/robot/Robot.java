@@ -85,9 +85,15 @@ public class Robot {
         hubs= hm.getAll(LynxModule.class);
         controlHub= hubs.get(0);
         expansionHub= hubs.get(1);
+        for(LynxModule hub: hubs)
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         initializeControllers();
         initializeMotors();
         initializeServos();
+    }
+    public void update(){
+        for(LynxModule hub: hubs)
+            hub.clearBulkCache();
     }
 
 

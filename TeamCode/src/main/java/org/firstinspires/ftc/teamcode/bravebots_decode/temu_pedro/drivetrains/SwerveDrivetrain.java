@@ -133,7 +133,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     double lastFRangle= 0, lastFLangle= 0, lastBRangle= 0, lastBLangle= 0;
 
     @Override
-    public void drive(double strafeX, double strafeY, double rotation) {
+    public void update(double strafeX, double strafeY, double rotation) {
 
         if(trackWidth== 0)
             throw new RuntimeException("Track Width nesetat");
@@ -141,8 +141,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             throw new RuntimeException("Wheel base nesetat");
         if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
             r= hypot(wheelBase, trackWidth);
-            rotation *= -1.8;
-            strafeY *= -1;
+            rotation *= -1.3;
+            //strafeY *= -1;
            // strafeX*=-1;
             double a = strafeX + rotation * (wheelBase / r),
                     b = strafeX - rotation * (wheelBase / r),
@@ -189,16 +189,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 }
 @Override
-    public void driveAuto(double strafeX, double strafeY, double rotation) {
-        // Calculate wheel vectors
-        // For rotation: each wheel moves perpendicular to its position vector
-        // FL is at (-trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, trackWidth/2) to velocity
-        // FR is at (trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, -trackWidth/2) to velocity
-        // BL is at (-trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, trackWidth/2) to velocity
-        // BR is at (trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, -trackWidth/2) to velocity
-   //     double smth= Math.sqrt(strafeX* strafeX + strafeY * strafeY);
-    //    double smth2= -.5 * smth+ .75;
-     //   rotation= rotation* smth2;
+    public void updateAuto(double strafeX, double strafeY, double rotation) {
+//         Calculate wheel vectors
+//         For rotation: each wheel moves perpendicular to its position vector
+//         FL is at (-trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, trackWidth/2) to velocity
+//         FR is at (trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, -trackWidth/2) to velocity
+//         BL is at (-trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, trackWidth/2) to velocity
+//         BR is at (trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, -trackWidth/2) to velocity
+          double smth= Math.sqrt(strafeX* strafeX + strafeY * strafeY);
+          double smth2= -.5 * smth+ .75;
+          rotation= rotation* smth2;
         if(Math.abs(strafeX) > 0.08 || Math.abs(strafeY)> 0.08 || Math.abs(rotation)> 0.08) {
             rotation *= -1;
             strafeX *= -1;
@@ -232,8 +232,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
             lastFLangle = frAngle;
             lastFRangle = flAngle;
-            lastBRangle = blAngle;
-            lastBLangle = brAngle;
+            lastBRangle = brAngle;
+            lastBLangle = blAngle;
             ok= true;
         }
 

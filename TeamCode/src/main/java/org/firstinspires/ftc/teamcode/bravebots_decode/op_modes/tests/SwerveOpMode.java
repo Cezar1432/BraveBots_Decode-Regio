@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.slew_rate_limiter.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
@@ -33,7 +34,7 @@ public class SwerveOpMode extends LinearOpMode {
     PDSFCoefficients coefs;
 
     ElapsedTime timer;
-    public static double p= 3, d= 0.5, s, f;
+    public static double p= 0, d= 0, s, f;
     boolean move= false;
     void reset(){
         swerveDriveTrain.fl.steeringServo.setPower(0);
@@ -48,6 +49,7 @@ public class SwerveOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry.setMsTransmissionInterval(500);
         r= new Robot(hardwareMap,  Alliance.BLUE);
         r.initialize();
         r.initialize();
@@ -65,10 +67,11 @@ public class SwerveOpMode extends LinearOpMode {
 
         while (opModeIsActive()){
 
-            forwardLimiter.setLimiter(limiter);
-            strafeLimiter.setLimiter(limiter);
-            rotationLimiter.setLimiter(limiter);
+//            forwardLimiter.setLimiter(limiter);
+//            strafeLimiter.setLimiter(limiter);
+//            rotationLimiter.setLimiter(limiter);
             swerveDriveTrain.setCoefs(new PDSFCoefficients(p, d, s, f));
+            gamepadLimiter.setLimiter(limiter);
             if(gamepad1.dpadUpWasPressed())
                 state= State.drive;
             if(gamepad1.dpadDownWasPressed())
@@ -81,7 +84,7 @@ public class SwerveOpMode extends LinearOpMode {
             y= forwardLimiter.calculate(gamepad1.left_stick_y);
             r= rotationLimiter.calculate(gamepad1.right_stick_x);
             if(state== State.drive)
-                swerveDriveTrain.drive(gamepadLimiter.getLeftX(), gamepadLimiter.getLeftY(), gamepadLimiter.getRightX());
+                swerveDriveTrain.update(gamepadLimiter.getLeftX(), gamepadLimiter.getLeftY(), gamepadLimiter.getRightX());
             else if(state== State.modul)
             {
                 if(gamepad1.crossWasPressed())
@@ -116,7 +119,7 @@ public class SwerveOpMode extends LinearOpMode {
             }
             }
             else{
-                swerveDriveTrain.drive(0, 0.5, 0);
+                swerveDriveTrain.update(0, 0.5, 0);
             }
 
 
@@ -145,15 +148,17 @@ public class SwerveOpMode extends LinearOpMode {
 //            telemetry.addData("back left angle", swerveDriveTrain.bl.getCurrentAngle());
 //            telemetry.addData("left sticy y", gamepad1.left_stick_y);
 
-            telemetry.addData("left front teoretic", swerveDriveTrain.fl.getTargetAngle());
-            telemetry.addData("left front practic", swerveDriveTrain.fl.getCurrentAngle());
-            telemetry.addData("right front teoretic", swerveDriveTrain.fr.getTargetAngle());
-            telemetry.addData("right front practic", swerveDriveTrain.fr.getCurrentAngle());
-            telemetry.addData("left back teoretic", swerveDriveTrain.bl.getTargetAngle());
-            telemetry.addData("left back practic", swerveDriveTrain.bl.getCurrentAngle());
-            telemetry.addData("right back teoretic", swerveDriveTrain.br.getTargetAngle());
-            telemetry.addData("right back practic", swerveDriveTrain.br.getCurrentAngle());
+            this.r.update();
+            telemetry.addData("fl unghi teoretic", swerveDriveTrain.fl.getTargetAngle());
+            telemetry.addData("fl unghi practic", swerveDriveTrain.fl.getCurrentAngle());
+            telemetry.addData("fr unghi teoretic", swerveDriveTrain.fr.getTargetAngle());
+            telemetry.addData("fr unghi practic", swerveDriveTrain.fr.getCurrentAngle());telemetry.addData("fl unghi teoretic", swerveDriveTrain.fl.getTargetAngle());
+            telemetry.addData("bl unghi practic", swerveDriveTrain.bl.getCurrentAngle());telemetry.addData("fl unghi teoretic", swerveDriveTrain.fl.getTargetAngle());
+            telemetry.addData("bl unghi practic", swerveDriveTrain.bl.getCurrentAngle());
+            telemetry.addData("br unghi teoretic", swerveDriveTrain.br.getTargetAngle());
+            telemetry.addData("br unghi practic", swerveDriveTrain.br.getCurrentAngle());
             telemetry.update();
+
         }
     }
 }
