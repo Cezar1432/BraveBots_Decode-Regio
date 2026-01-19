@@ -12,7 +12,7 @@ public class Constants {
     public static double strafeThreshold=3, forwardThreshold=3, headingThreshold= 0.1;
     public static PIDFController strafe= new PIDFController(0.01,0,0.00001,0);
     public static PIDFController forward= new PIDFController(0.01,0,0.00001,0);
-    public static PIDFController heading= new PIDFController(2,0,0.15,0);
+    public static PIDFController heading= new PIDFController(3.2,0,0.23,0);
     public static PIDFController secondaryStrafe= new PIDFController(0.14,0,0.015,0);
     public static PIDFController secondaryForward= new PIDFController(0.08,0,0.00001,0);
     public static PIDFController secondaryHeading= new PIDFController(2,0,0.15,0);

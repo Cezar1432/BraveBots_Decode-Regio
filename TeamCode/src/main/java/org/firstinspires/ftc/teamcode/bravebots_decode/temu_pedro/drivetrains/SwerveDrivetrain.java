@@ -4,10 +4,15 @@ import static java.lang.Math.atan2;
 import static java.lang.Math.hypot;
 import static java.lang.Math.toDegrees;
 
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.slew_rate_limiter.GamepadLimiter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 
@@ -19,8 +24,10 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
     public SwerveModule fl, fr, bl, br;
 
+    Robot robot;
     public SwerveDrivetrain(Robot robot) {
 
+        this.robot= robot;
         initialize(robot);
         fr = new SwerveModule(mFR, sFR);
         br = new SwerveModule(mBR, sBR);
@@ -44,13 +51,26 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         mFL.setDirection(DcMotorSimple.Direction.REVERSE);
 
     }
+    volatile Gamepad gp;
+    volatile GamepadLimiter gamepadLimiter;
+    public SwerveDrivetrain(Robot robot, Gamepad gp, double limiter){
+        this.robot= robot;
+        initialize(robot);
+        fr = new SwerveModule(mFR, sFR);
+        br = new SwerveModule(mBR, sBR);
+        fl = new SwerveModule(mFL, sFL);
+        bl = new SwerveModule(mBL, sBL);
+        this.gp= gp;
+        gamepadLimiter= new GamepadLimiter(this.gp, limiter);
+
+    }
 
     private double wheelBase = 0;
     private double trackWidth = 0;
     //private  double r = Math.sqrt((wheelBase * wheelBase) + (trackWidth * trackWidth));
 
 
-    public double r= hypot(wheelBase, trackWidth);
+    public double radius= hypot(wheelBase, trackWidth);
     public void setWheelBase(double wheelBase){
         this.wheelBase= wheelBase;
     }
@@ -75,7 +95,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
         double speed;
-        public void setState(double speed, double angle) {
+        public synchronized void setState(double speed, double angle) {
             // Get current angle
             double currentAngle = steeringServo.getTruePosition() * 360.0;
 
@@ -129,25 +149,115 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         }
     }
     public boolean ok= false;
+    PIDFController headingController;
 
     double lastFRangle= 0, lastFLangle= 0, lastBRangle= 0, lastBLangle= 0;
+    volatile boolean running= false;
+    volatile double lastAngle;
+    public void startUpdateThread(){
+        Robot r= Robot.getInstance();
+        headingController= new PIDFController(Constants.strafe.getP(), Constants.strafe.getI(), Constants.strafe.getD(), Constants.strafe.getF());
+        Thread t= new Thread(()->{
+            while(running && Thread.currentThread().isAlive()) {
+                try {
+                    double strafeX = gamepadLimiter.getLeftX();
+                    double strafeY = gamepadLimiter.getLeftY();
+                    double rotation = gamepadLimiter.getRightX();
+                    if (trackWidth == 0)
+                        throw new IllegalArgumentException("Track Width nesetat");
+                    if (wheelBase == 0)
+                        throw new IllegalArgumentException("Wheel Base nesetat");
+                    if (Math.abs(strafeX) > 0.02 || Math.abs(strafeY) > 0.02 || Math.abs(rotation) > 0.02) {
+                        radius = hypot(wheelBase, trackWidth);
+                        if(rotation< .1)
+                            rotation= headingController.calculate(r.odo.getHeading(AngleUnit.DEGREES), lastAngle);
+                        else {
+                            rotation *= -1.1;
+                            lastAngle= r.odo.getHeading(AngleUnit.DEGREES);
+                        }
+
+
+                        //strafeY *= -1;
+                        // strafeX*=-1;
+                        double a = strafeX + rotation * (wheelBase / radius),
+                                b = strafeX - rotation * (wheelBase / radius),
+                                c = strafeY + rotation * (trackWidth / radius),
+                                d = strafeY - rotation * (trackWidth / radius);
+
+
+                        double flSpeed = hypot(b, c),
+                                frSpeed = hypot(b, d),
+                                brSpeed = hypot(a, d),
+                                blSpeed = hypot(a, c);
+                        double flAngle = atan2(b, c),
+                                frAngle = atan2(b, d),
+                                brAngle = atan2(a, d),
+                                blAngle = atan2(a, c);
+
+                        double max = Math.max(Math.max(flSpeed, frSpeed), Math.max(brSpeed, blSpeed));
+                        if (max > 1) {
+                            flSpeed /= max;
+                            frSpeed /= max;
+                            blSpeed /= max;
+                            brSpeed /= max;
+                        }
+
+                        fl.setState(flSpeed, toDegrees(flAngle));
+                        fr.setState(frSpeed, toDegrees(frAngle));
+                        bl.setState(brSpeed, toDegrees(blAngle));
+                        br.setState(blSpeed, toDegrees(brAngle));
+
+                        lastFLangle = frAngle;
+                        lastFRangle = flAngle;
+                        lastBRangle = blAngle;
+                        lastBLangle = brAngle;
+                    } else {
+                        fl.setState(0, toDegrees(lastFLangle));
+                        fr.setState(0, toDegrees(lastFRangle));
+                        bl.setState(0, toDegrees(lastBLangle));
+                        br.setState(0, toDegrees(lastBRangle));
+                    }
+                    Thread.sleep(1);
+                }
+                catch (InterruptedException e){
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+        });
+        running= true;
+
+    }
+    public double rot;
 
     @Override
     public void update(double strafeX, double strafeY, double rotation) {
 
+        if(headingController== null){
+            headingController= new PIDFController(Constants.strafe.getP() * 1.2, Constants.strafe.getI(), Constants.strafe.getD() * 1.2, Constants.strafe.getF());
+        }
         if(trackWidth== 0)
             throw new IllegalArgumentException("Track Width nesetat");
         if(wheelBase== 0)
             throw new IllegalArgumentException("Wheel Base nesetat");
         if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
-            r= hypot(wheelBase, trackWidth);
-            rotation *= -1.3;
+            radius= hypot(wheelBase, trackWidth);
+            //double heading= robot.odo.getHeading(AngleUnit.DEGREES);
+
             //strafeY *= -1;
-           // strafeX*=-1;
-            double a = strafeX + rotation * (wheelBase / r),
-                    b = strafeX - rotation * (wheelBase / r),
-                    c = strafeY + rotation * (trackWidth / r),
-                    d = strafeY - rotation * (trackWidth / r);
+            // strafeX*=-1;
+            if(Math.abs(rotation)>.1){
+                rotation*= -1.15;
+                lastAngle= robot.robotHeading;
+            }
+            else{
+                rotation= headingController.calculate(robot.robotHeading, lastAngle);
+            }
+            rot= rotation;
+            double a = strafeX + rotation * (wheelBase / radius),
+                    b = strafeX - rotation * (wheelBase / radius),
+                    c = strafeY + rotation * (trackWidth / radius),
+                    d = strafeY - rotation * (trackWidth / radius);
 
 
             double flSpeed = hypot(b, c),
@@ -172,10 +282,10 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             bl.setState(brSpeed, toDegrees(blAngle));
             br.setState(blSpeed, toDegrees(brAngle));
 
-            lastFLangle = frAngle;
-            lastFRangle = flAngle;
-            lastBRangle = blAngle;
-            lastBLangle = brAngle;
+            lastFLangle = flAngle;
+            lastFRangle = frAngle;
+            lastBLangle = blAngle;
+            lastBRangle = brAngle;
         }
 
         else{
@@ -187,8 +297,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
 
-}
-@Override
+    }
+    @Override
     public void updateAuto(double strafeX, double strafeY, double rotation) {
 //         Calculate wheel vectors
 //         For rotation: each wheel moves perpendicular to its position vector
@@ -196,17 +306,17 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 //         FR is at (trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, -trackWidth/2) to velocity
 //         BL is at (-trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, trackWidth/2) to velocity
 //         BR is at (trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, -trackWidth/2) to velocity
-          double smth= Math.sqrt(strafeX* strafeX + strafeY * strafeY);
-          double smth2= -.5 * smth+ .75;
-          rotation= rotation* smth2;
+        double smth= Math.sqrt(strafeX* strafeX + strafeY * strafeY);
+        double smth2= -.5 * smth+ .75;
+        rotation= rotation* smth2;
         if(Math.abs(strafeX) > 0.08 || Math.abs(strafeY)> 0.08 || Math.abs(rotation)> 0.08) {
             rotation *= -1;
             strafeX *= -1;
             strafeY*= -1;
-            double a = strafeX + rotation * (wheelBase / r),
-                    b = strafeX - rotation * (wheelBase / r),
-                    c = strafeY + rotation * (trackWidth / r),
-                    d = strafeY - rotation * (trackWidth / r);
+            double a = strafeX + rotation * (wheelBase / radius),
+                    b = strafeX - rotation * (wheelBase / radius),
+                    c = strafeY + rotation * (trackWidth / radius),
+                    d = strafeY - rotation * (trackWidth / radius);
 
             double flSpeed = hypot(b, c),
                     frSpeed = hypot(b, d),
@@ -260,5 +370,6 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     }
 
 
-    }
+}
+
 

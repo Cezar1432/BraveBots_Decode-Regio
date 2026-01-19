@@ -7,14 +7,18 @@ import com.qualcomm.robotcore.hardware.AnalogInputController;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 
 import java.util.List;
+
+import javax.microedition.khronos.egl.EGL;
 
 public class Robot {
 
@@ -78,7 +82,10 @@ public class Robot {
     public void initializeRest(){
         odo= hm.get(GoBildaPinpointDriver.class, "nigg");
         odo.setOffsets(11.1, -5, DistanceUnit.CM);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
     }
+    public double robotHeading= 0;
     public void initialize(){
 
         instance= t== null? new Robot(this.hm, this.a) : new Robot(this.hm, this.t, this.a);
@@ -90,10 +97,18 @@ public class Robot {
         initializeControllers();
         initializeMotors();
         initializeServos();
+        initializeRest();
     }
+    ElapsedTime timer;
     public void update(){
+        if(timer== null)
+            timer= new ElapsedTime();
         for(LynxModule hub: hubs)
             hub.clearBulkCache();
+
+        odo.update();
+        robotHeading= odo.getHeading(AngleUnit.DEGREES);
+
     }
 
 

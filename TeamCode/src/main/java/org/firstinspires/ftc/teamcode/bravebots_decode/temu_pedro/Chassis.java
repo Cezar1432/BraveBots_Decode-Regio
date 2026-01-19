@@ -41,8 +41,8 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.DrivetrainInterface;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
-import org.firstinspires.ftc.teamcode.bravebots_decode.utils.localizers.Localizer;
-import org.firstinspires.ftc.teamcode.bravebots_decode.utils.localizers.PinpointV1;
+import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.localizers.Localizer;
+import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.localizers.PinpointV1;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 
 public class Chassis implements Runnable{

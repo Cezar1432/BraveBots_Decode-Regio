@@ -30,6 +30,8 @@ public class SlewRateLimiter {
             double maxChange = deltaTime * limiter;
             if (Math.abs(input - lastValue) > maxChange)
                 lastValue += maxChange * Math.signum(input - lastValue);
+            else
+                lastValue= input;
             return lastValue;
 
         }
