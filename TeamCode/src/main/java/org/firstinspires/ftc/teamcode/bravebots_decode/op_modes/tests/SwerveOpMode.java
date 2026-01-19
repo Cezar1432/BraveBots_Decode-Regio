@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.Sw
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.slew_rate_limiter.GamepadLimiter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 
-@TeleOp
+@TeleOp(group = "Tests")
 @Configurable
 public class SwerveOpMode extends LinearOpMode {
 
@@ -121,6 +121,9 @@ public class SwerveOpMode extends LinearOpMode {
             }
 
 
+
+            if(gamepad1.rightBumperWasPressed())
+                swerveDriveTrain.setHeadingController();
 
 
 

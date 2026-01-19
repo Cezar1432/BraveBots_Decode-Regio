@@ -83,6 +83,15 @@ public class MecanumDrivetrain implements DrivetrainInterface {
 
     }
 
+    @Override
+    public void setTrackWidth(double trackWith) {
+
+    }
+
+    @Override
+    public void setWheelBase(double wheelBase) {
+
+    }
 
 
     public void climb(double power){

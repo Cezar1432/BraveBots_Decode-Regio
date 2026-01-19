@@ -229,12 +229,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
     }
     public double rot;
+    public void setHeadingController(){
+        headingController= new PIDFController(Constants.pHeading , Constants.strafe.getI(), Constants.dHeading * 1.2, Constants.strafe.getF());
+
+    }
 
     @Override
     public void update(double strafeX, double strafeY, double rotation) {
 
         if(headingController== null){
-            headingController= new PIDFController(Constants.strafe.getP() * 1.2, Constants.strafe.getI(), Constants.strafe.getD() * 1.2, Constants.strafe.getF());
+            headingController= new PIDFController(Constants.pHeading , Constants.strafe.getI(), Constants.dHeading * 1.2, Constants.strafe.getF());
         }
         if(trackWidth== 0)
             throw new IllegalArgumentException("Track Width nesetat");
@@ -300,23 +304,37 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     }
     @Override
     public void updateAuto(double strafeX, double strafeY, double rotation) {
+
+        if(trackWidth== 0)
+            throw new IllegalArgumentException("Track WIdth nesetat");
+        if(wheelBase==0 )
+            throw new IllegalArgumentException("Wheel Base nesetat");
 //         Calculate wheel vectors
 //         For rotation: each wheel moves perpendicular to its position vector
 //         FL is at (-trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, trackWidth/2) to velocity
 //         FR is at (trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, -trackWidth/2) to velocity
 //         BL is at (-trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, trackWidth/2) to velocity
 //         BR is at (trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, -trackWidth/2) to velocity
-        double smth= Math.sqrt(strafeX* strafeX + strafeY * strafeY);
-        double smth2= -.5 * smth+ .75;
-        rotation= rotation* smth2;
+//        double smth= Math.sqrt(strafeX* strafeX + strafeY * strafeY);
+//        double smth2= -.5 * smth+ .75;
+        radius= hypot(trackWidth, wheelBase);
+        //rotation= rotation* smth2;
+
         if(Math.abs(strafeX) > 0.08 || Math.abs(strafeY)> 0.08 || Math.abs(rotation)> 0.08) {
-            rotation *= -1;
-            strafeX *= -1;
-            strafeY*= -1;
+            strafeX*=-1;
+            rotation *= -1.1;
+            double rawMax= Math.max(Math.abs(strafeX), Math.max(Math.abs(strafeY), Math.abs(rotation)));
+            rawMax= Math.abs(rawMax);
+            strafeX/=rawMax;
+            strafeY/=rawMax;
+            rotation/=rawMax;
+//            strafeX *= -1;
+//            strafeY*= -1;
             double a = strafeX + rotation * (wheelBase / radius),
                     b = strafeX - rotation * (wheelBase / radius),
                     c = strafeY + rotation * (trackWidth / radius),
                     d = strafeY - rotation * (trackWidth / radius);
+
 
             double flSpeed = hypot(b, c),
                     frSpeed = hypot(b, d),
@@ -335,15 +353,15 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                 brSpeed /= max;
             }
 
-            fl.setState(frSpeed, toDegrees(frAngle));
-            fr.setState(flSpeed, toDegrees(flAngle));
-            bl.setState(brSpeed, toDegrees(brAngle));
-            br.setState(blSpeed, toDegrees(blAngle));
+            fl.setState(flSpeed, toDegrees(flAngle));
+            fr.setState(frSpeed, toDegrees(frAngle));
+            bl.setState(brSpeed, toDegrees(blAngle));
+            br.setState(blSpeed, toDegrees(brAngle));
 
-            lastFLangle = frAngle;
-            lastFRangle = flAngle;
-            lastBRangle = brAngle;
+            lastFLangle = flAngle;
+            lastFRangle = frAngle;
             lastBLangle = blAngle;
+            lastBRangle = brAngle;
             ok= true;
         }
 

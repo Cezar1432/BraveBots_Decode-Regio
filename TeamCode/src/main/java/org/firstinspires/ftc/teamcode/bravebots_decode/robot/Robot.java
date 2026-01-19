@@ -82,7 +82,7 @@ public class Robot {
     public void initializeRest(){
         odo= hm.get(GoBildaPinpointDriver.class, "nigg");
         odo.setOffsets(11.1, -5, DistanceUnit.CM);
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
     }
     public double robotHeading= 0;

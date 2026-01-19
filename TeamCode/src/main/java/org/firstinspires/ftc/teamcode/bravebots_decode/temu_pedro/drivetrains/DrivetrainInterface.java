@@ -7,5 +7,7 @@ public interface DrivetrainInterface {
     void update(double s, double f, double r);
     void updateAuto(double s, double f, double r);
     void setCoefs(PDSFCoefficients c);
+    void setTrackWidth(double trackWith);
+    void setWheelBase(double wheelBase);
    // boolean ok= false;
 }
