@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.bravebots_decode.useful.Robot;
-import org.firstinspires.ftc.teamcode.bravebots_decode.math.PDSFCoefficients;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 
 
 
@@ -38,7 +38,7 @@ public class MecanumDrivetrain implements DrivetrainInterface {
 
 
     @Override
-    public void drive(double s, double f, double r) {
+    public void update(double s, double f, double r) {
 
     }
 
@@ -59,7 +59,7 @@ public class MecanumDrivetrain implements DrivetrainInterface {
 //        rightBack.setPower(br);
 //        rightFront.setPower(fr);
 //    }
-    public void driveAuto(double s, double f, double r){
+    public void updateAuto(double s, double f, double r){
         s*= -1;
         r*=-1;
         //  f*=-1;

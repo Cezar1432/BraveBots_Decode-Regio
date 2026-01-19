@@ -6,10 +6,10 @@ import static java.lang.Math.toDegrees;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.bravebots_decode.useful.Robot;
-import org.firstinspires.ftc.teamcode.bravebots_decode.math.PDSFCoefficients;
-import org.firstinspires.ftc.teamcode.bravebots_decode.wrappers.BetterCRServo;
-import org.firstinspires.ftc.teamcode.bravebots_decode.wrappers.BetterMotor;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 
 
 public class SwerveDrivetrain implements DrivetrainInterface {
@@ -45,8 +45,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
     }
 
-    private double wheelBase = 35;
-    private double trackWidth = 35;
+    private double wheelBase = 0;
+    private double trackWidth = 0;
     //private  double r = Math.sqrt((wheelBase * wheelBase) + (trackWidth * trackWidth));
 
 
@@ -73,6 +73,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         }
 
 
+
         double speed;
         public void setState(double speed, double angle) {
             // Get current angle
@@ -90,15 +91,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
             double targetAngle = currentAngle + diff;
 
-//            if(Math.abs(diff) > 45)
-//                speed= 0;
 
             steeringServo.setAngle(targetAngle);
             steeringServo.update();
 
-            driveMotor.setPower(speed);
+            double alignmentFactor=  1 - Math.abs(diff)/90;
+
+            driveMotor.setPower(speed * alignmentFactor);
             this.speed= speed;
         }
+
 
         public double getCurrentAngle() {
             return steeringServo.getTruePosition() * 360.0;
@@ -123,7 +125,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
         public void setCoefs(PDSFCoefficients coefs) {
-            steeringServo.setCoefs(coefs);
+            steeringServo.setCoefs(coefs.p, coefs.d, coefs.s, coefs.f);
         }
     }
     public boolean ok= false;
@@ -132,84 +134,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
     @Override
     public void drive(double strafeX, double strafeY, double rotation) {
-        // Calculate wheel vectors
-        // For rotation: each wheel moves perpendicular to its position vector
-        // FL is at (-trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, trackWidth/2) to velocity
-        // FR is at (trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, -trackWidth/2) to velocity
-        // BL is at (-trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, trackWidth/2) to velocity
-        // BR is at (trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, -trackWidth/2) to velocity
-//        if(Math.abs(strafeX)>= 0.02 || Math.abs(strafeY)>= 0.02 || Math.abs(rotation)>= 0.02) {
-//            strafeY *= -1;
-//            double smth = Math.sqrt(strafeX * strafeX + strafeY * strafeY);
-//            double smth2 = -.5 * smth + .75;
-//            rotation = rotation * smth2;
-//
-//            ok= true;
-//
-//        double halfWheelBase = wheelBase / 2.0;
-//        double halfTrackWidth = trackWidth / 2.0;
-//
-//        // For each wheel, rotation creates a velocity perpendicular to its position
-//        // Front Left: position (-halfTrackWidth, +halfWheelBase)
-//        // Rotation adds: (+rotation * halfWheelBase, +rotation * halfTrackWidth)
-//        double flX = strafeX + rotation * halfWheelBase; //b
-//        double flY = strafeY + rotation * halfTrackWidth; //d
-//
-//        // Front Right: position (+halfTrackWidth, +halfWheelBase)
-//        // Rotation adds: (+rotation * halfWheelBase, -rotation * halfTrackWidth)
-//        double frX = strafeX + rotation * halfWheelBase;
-//        double frY = strafeY - rotation * halfTrackWidth;
-//
-//        // Back Left: position (-halfTrackWidth, -halfWheelBase)
-//        // Rotation adds: (-rotation * halfWheelBase, +rotation * halfTrackWidth)
-//        double blX = strafeX - rotation * halfWheelBase;
-//        double blY = strafeY + rotation * halfTrackWidth;
-//
-//        // Back Right: position (+halfTrackWidth, -halfWheelBase)
-//        // Rotation adds: (-rotation * halfWheelBase, -rotation * halfTrackWidth)
-//        double brX = strafeX - rotation * halfWheelBase;
-//        double brY = strafeY - rotation * halfTrackWidth;
-//
-//        // Calculate speed and angle for each wheel
-//        double flSpeed = Math.sqrt(flX * flX + flY * flY);
-//        double flAngle = Math.toDegrees(Math.atan2(flX, flY));
-//
-//        double frSpeed = Math.sqrt(frX * frX + frY * frY);
-//        double frAngle = Math.toDegrees(Math.atan2(frX, frY));
-//
-//        double blSpeed = Math.sqrt(blX * blX + blY * blY);
-//        double blAngle = Math.toDegrees(Math.atan2(blX, blY));
-//
-//        double brSpeed = Math.sqrt(brX * brX + brY * brY);
-//        double brAngle = Math.toDegrees(Math.atan2(brX, brY));
-//
-//        // Normalize speeds
-//        double maxSpeed = Math.max(Math.max(flSpeed, frSpeed), Math.max(blSpeed, brSpeed));
-//        if (maxSpeed > 1.0) {
-//            flSpeed /= maxSpeed;
-//            frSpeed /= maxSpeed;
-//            blSpeed /= maxSpeed;
-//            brSpeed /= maxSpeed;
-//        }
-//
-//        // Set module states
-//        fl.setState(flSpeed, flAngle);
-//        fr.setState(frSpeed, frAngle);
-//        bl.setState(blSpeed, blAngle);
-//        br.setState(brSpeed, brAngle);
-//    }
-//        else{
-//            ok= false;
-//            fl.stop(45);
-//            fr.stop(135);
-//            bl.stop(135);
-//            br.stop(45);
-//        }
 
+        if(trackWidth== 0)
+            throw new RuntimeException("Track Width nesetat");
+        if(wheelBase== 0)
+            throw new RuntimeException("Wheel base nesetat");
         if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
             r= hypot(wheelBase, trackWidth);
-            rotation *= -1;
-            //strafeY *= -1;
+            rotation *= -1.8;
+            strafeY *= -1;
+           // strafeX*=-1;
             double a = strafeX + rotation * (wheelBase / r),
                     b = strafeX - rotation * (wheelBase / r),
                     c = strafeY + rotation * (trackWidth / r),
@@ -233,10 +167,10 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                 brSpeed /= max;
             }
 
-            fl.setState(frSpeed, toDegrees(frAngle));
-            fr.setState(flSpeed, toDegrees(flAngle));
-            bl.setState(brSpeed, toDegrees(brAngle));
-            br.setState(blSpeed, toDegrees(blAngle));
+            fl.setState(flSpeed, toDegrees(flAngle));
+            fr.setState(frSpeed, toDegrees(frAngle));
+            bl.setState(brSpeed, toDegrees(blAngle));
+            br.setState(blSpeed, toDegrees(brAngle));
 
             lastFLangle = frAngle;
             lastFRangle = flAngle;

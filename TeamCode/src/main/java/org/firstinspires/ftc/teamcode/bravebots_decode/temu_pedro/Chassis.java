@@ -36,14 +36,14 @@ import static org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constan
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.bravebots_decode.useful.Robot;
-import org.firstinspires.ftc.teamcode.bravebots_decode.math.Pose;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.DrivetrainInterface;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
-import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.localizers.Localizer;
-import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.localizers.PinpointV1;
-import org.firstinspires.ftc.teamcode.bravebots_decode.wrappers.BetterMotor;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.localizers.Localizer;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.localizers.PinpointV1;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 
 public class Chassis implements Runnable{
 
@@ -402,7 +402,7 @@ public class Chassis implements Runnable{
                 targetHeading = PinpointV1.normalizeHeading(targetHeading);
 
                 ///drive(-yRotated, xRotated, theta);
-                drivetrain.driveAuto(yRotated, xRotated, theta);
+                drivetrain.updateAuto(yRotated, xRotated, theta);
 
             }
         }
