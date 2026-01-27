@@ -164,6 +164,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             driveMotor.setPower(targetSpeed);
             steeringServo.setAngle(targetAngle);
             steeringServo.update();
+
         }
 
         public void setCoefs(PDSFCoefficients coefs) {
@@ -268,18 +269,20 @@ public class SwerveDrivetrain implements DrivetrainInterface {
       //  final GamepadLimiter limiter1= new GamepadLimiter(strafeX, strafeY, rotation, 6);
         timer= new ElapsedTime();
         running= true;
-        new Thread(()->{
+        Thread t= new Thread(()->{
             while (running && !Thread.currentThread().isInterrupted())
             {
                 try{
                     update();
-                    Thread.sleep(1);
+                    Thread.sleep(5);
                 }
                 catch (InterruptedException e){
                     Thread.currentThread().interrupt();
                 }
             }
-        }).start();
+        });
+        t.setPriority(Thread.NORM_PRIORITY);
+        t.start();
 
     }
     volatile public DoubleSupplier leftX, leftY, rightX;

@@ -22,7 +22,6 @@ import java.util.LinkedList;
 public class Scheduler {
 
     Chassis f;
-    SwerveDriveKinematics k= new SwerveDriveKinematics();
 
 
     boolean last= true, current= false, justDone= false;

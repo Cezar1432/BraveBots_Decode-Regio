@@ -52,8 +52,8 @@ public class BetterServo extends ServoImpl implements Servo, HardwareDevice {
     }
     private double position;
 
-    public void turn(double pos){
-        setPosition(getPosition()+ 0.0025*pos);
+    public void turn(double angle){
+        setPosition(getPosition()+ angle/maxDegrees);
     }
 
 

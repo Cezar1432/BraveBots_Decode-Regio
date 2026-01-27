@@ -5,6 +5,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.AnalogInputController;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoController;
@@ -86,8 +87,11 @@ public class Robot {
         rightFront= new BetterMotor(controlHubMotors, 0);
         rightBack= new BetterMotor(controlHubMotors, 1);
         turret= new BetterMotor(controlHubMotors, 2);
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake= new BetterMotor(expansionHubMotors, 2);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter= new BetterMotorEx(expansionHubMotors, 3);
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
     private void assignHardware(){
