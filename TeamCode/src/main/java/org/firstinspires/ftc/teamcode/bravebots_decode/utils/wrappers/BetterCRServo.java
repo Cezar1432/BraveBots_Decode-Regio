@@ -106,6 +106,7 @@ public class BetterCRServo extends CRServoImpl implements CRServo, HardwareDevic
             pidfController.setPIDF(p,i,d,f);
     }
 
+
     public double error, normalizePos;
     public void update(){
         if(mode== Mode.PID){

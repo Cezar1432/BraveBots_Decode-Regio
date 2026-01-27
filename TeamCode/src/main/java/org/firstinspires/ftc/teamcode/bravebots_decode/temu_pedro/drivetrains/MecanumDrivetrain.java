@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 
+import java.util.function.DoubleSupplier;
 
 
 public class MecanumDrivetrain implements DrivetrainInterface {
@@ -37,9 +38,32 @@ public class MecanumDrivetrain implements DrivetrainInterface {
     }
 
 
-    @Override
     public void update(double s, double f, double r) {
 
+    }
+
+    DoubleSupplier leftX, leftY, rightX;
+    @Override
+    public void setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX) {
+        this.leftX= leftX;
+        this.leftY= leftY;
+        this.rightX= rightX;
+    }
+
+    @Override
+    public void update() {
+
+        double x= leftX.getAsDouble(), y= leftY.getAsDouble(), r= rightX.getAsDouble();
+        double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
+        double fl = (y + x + r) / d;
+        double bl = (y - x + r) / d;
+        double fr = (y - x - r) / d;
+        double br = (y + x - r) / d;
+
+        leftFront.setPower(fl);
+        leftBack.setPower(bl);
+        rightBack.setPower(br);
+        rightFront.setPower(fr);
     }
 
     //    public void drive(double x, double y, double r){

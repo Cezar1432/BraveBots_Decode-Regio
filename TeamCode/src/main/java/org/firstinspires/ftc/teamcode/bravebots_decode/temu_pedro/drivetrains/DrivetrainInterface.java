@@ -3,8 +3,11 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains;
 
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 
+import java.util.function.DoubleSupplier;
+
 public interface DrivetrainInterface {
-    void update(double s, double f, double r);
+    void setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX);
+    void update();
     void updateAuto(double s, double f, double r);
     void setCoefs(PDSFCoefficients c);
     void setTrackWidth(double trackWith);

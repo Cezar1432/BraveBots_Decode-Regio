@@ -67,6 +67,7 @@ public class SwerveOpMode extends LinearOpMode {
         gamepadLimiter= new GamepadLimiter(gamepad1, limiter);
         //swerveDriveTrain.startUpdateThread();
 
+        swerveDriveTrain.setSuppliers(()->gamepad1.left_stick_x,()-> gamepad1.left_stick_y,()-> gamepad1.right_stick_x);
         while (opModeIsActive()){
 
 //            forwardLimiter.setLimiter(limiter);
@@ -82,7 +83,7 @@ public class SwerveOpMode extends LinearOpMode {
                 state= State.fata;
 
             if(state== State.drive)
-                swerveDriveTrain.update(gamepadLimiter.getLeftX(), gamepadLimiter.getLeftY(), gamepadLimiter.getRightX());
+                swerveDriveTrain.update();
             else if(state== State.modul)
             {
                 if(gamepad1.crossWasPressed())
@@ -117,7 +118,7 @@ public class SwerveOpMode extends LinearOpMode {
             }
             }
             else{
-                swerveDriveTrain.update(0, 0.5, 0);
+                swerveDriveTrain.update(0, 0.6, 0);
             }
 
 
@@ -131,6 +132,7 @@ public class SwerveOpMode extends LinearOpMode {
             telemetry.addData("hz", 1/timer.seconds());
             telemetry.addData("rotation", swerveDriveTrain.rot);
             telemetry.addData("robot heading", r.robotHeading);
+            telemetry.addData("p", swerveDriveTrain.headingController.getP());
             timer.reset();
 
 //            telemetry.addData("state", state);

@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.DrivetrainInterface;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.MecanumDrivetrain;
@@ -84,8 +85,9 @@ public class Chassis implements Runnable{
         running= true;
         new Thread(()-> {
             while (running && !Thread.currentThread().isInterrupted()) {
-                update();
+
                 try {
+                    update();
                     Thread.sleep(threadUpdatePeriod);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -144,6 +146,10 @@ public class Chassis implements Runnable{
             this.localizer= new PinpointV1(robot);
     }
 
+    double maxPower= 1;
+    public void setMaxPower(double maxPower){
+        this.maxPower= maxPower;
+    }
 
     public enum Control{
         AUTO, GAMEPAD;
@@ -323,6 +329,7 @@ public class Chassis implements Runnable{
 
 
     }
+    public double hError;
     public double xRotated, yRotated;
     public void update() {
         synchronized (this) {
@@ -366,32 +373,35 @@ public class Chassis implements Runnable{
                         remainingDistance = getDistanceFromTarget();
 
                         travelledDistance = totalDistance - remainingDistance;
-                        deltaHeading = targetPosition.getTheta() - movementStartPose.getTheta();
-                        targetHeading = deltaHeading * (travelledDistance / totalDistance) + movementStartPose.getTheta();
+                        deltaHeading = targetPosition.getNormalizedTheta() - movementStartPose.getNormalizedTheta();
+                        targetHeading = deltaHeading * (travelledDistance / totalDistance) + movementStartPose.getNormalizedTheta();
 
 
-                        if (!useSecondaryHeading || Math.abs(PinpointV1.normalizeHeading(currentPose.getTheta() - targetPosition.getTheta())) > headingThreshold)
-                            theta = heading.calculate(targetHeading, currentPose.getTheta());
+                        hError= MathStuff.normalizeRadians(targetHeading- currentPose.getNormalizedTheta());
+                        if (!useSecondaryHeading || Math.abs(PinpointV1.normalizeHeading(currentPose.getNormalizedTheta() - targetPosition.getNormalizedTheta())) > headingThreshold)
+                            theta = heading.calculate(0, hError);
                         else
-                            theta = secondaryHeading.calculate(targetHeading, currentPose.getTheta());
+                            theta = secondaryHeading.calculate(0, hError);
                         break;
                     }
                     case TANGENTIAL: {
 
+                        double hError= MathStuff.normalizeRadians(targetHeading- currentPose.getNormalizedTheta());
                         if (!useSecondaryHeading || Math.abs(PinpointV1.normalizeHeading(currentPose.getTheta() - targetHeading)) > headingThreshold)
-                            theta = heading.calculate(targetHeading, currentPose.getTheta());
+                            theta = heading.calculate(0, hError);
                         else
-                            theta = secondaryHeading.calculate(targetHeading, currentPose.getTheta());
+                            theta = secondaryHeading.calculate(0, hError);
 
                         break;
                     }
                     case CONSTANT: {
 
-                        targetHeading = targetPosition.getTheta();
+                        targetHeading = targetPosition.getNormalizedTheta();
+                        hError= MathStuff.normalizeRadians(targetHeading- currentPose.getNormalizedTheta());
                         if (!useSecondaryHeading || Math.abs(PinpointV1.normalizeHeading(currentPose.getTheta() - targetPosition.getTheta())) > headingThreshold)
-                            theta = heading.calculate(targetHeading, currentPose.getTheta());
+                            theta = heading.calculate(0, hError);
                         else
-                            theta = secondaryHeading.calculate(targetHeading, currentPose.getTheta());
+                            theta = secondaryHeading.calculate(0, hError);
 
                         break;
                     }
@@ -402,7 +412,7 @@ public class Chassis implements Runnable{
                 targetHeading = PinpointV1.normalizeHeading(targetHeading);
 
                 ///drive(-yRotated, xRotated, theta);
-                drivetrain.updateAuto(yRotated, xRotated, theta);
+                drivetrain.updateAuto(yRotated * maxPower, xRotated * maxPower, -theta * maxPower);
 
             }
         }

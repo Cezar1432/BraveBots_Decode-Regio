@@ -41,8 +41,16 @@ public class Pose {
     public double getY(){
        return this.y;
     }
+    double normalize(double h){
+       while (h> Math.PI) h-=2* Math.PI;
+       while (h< -Math.PI) h+=2* Math.PI;
+       return h;
+    }
     public double getTheta(){
        return this.theta;
+    }
+    public double getNormalizedTheta(){
+       return normalize(this.theta);
     }
     public Pose getPose(){
        return this;

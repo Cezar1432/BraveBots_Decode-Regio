@@ -7,14 +7,20 @@ import static java.lang.Math.toDegrees;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Consumer;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.slew_rate_limiter.GamepadLimiter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 
 public class SwerveDrivetrain implements DrivetrainInterface {
@@ -78,10 +84,21 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         this.trackWidth= trackWidth;
     }
 
+    public class ModuleFinalOutput{
+        public double motorPower, servoPower;
+        public void setMotorPower(double power)
+        {
+            this.motorPower= power;
+        }
+        public void setServoPower(double power){
+            this.servoPower= power;
+        }
+    }
 
     public class SwerveModule {
         public BetterMotor driveMotor;
         public BetterCRServo steeringServo;
+
 
         double targetSpeed = 0;
         double targetAngle = 0;
@@ -94,7 +111,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
 
-        double speed;
+
         public synchronized void setState(double speed, double angle) {
             // Get current angle
             double currentAngle = steeringServo.getTruePosition() * 360.0;
@@ -109,16 +126,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                 speed = -speed;
             }
 
-            double targetAngle = currentAngle + diff;
 
-
-            steeringServo.setAngle(targetAngle);
-            steeringServo.update();
+            //  steeringServo.setAngle(targetAngle);
+          //  steeringServo.update();
+            this.targetAngle= currentAngle + diff;
 
             double alignmentFactor=  1 - Math.abs(diff)/90;
 
-            driveMotor.setPower(speed * alignmentFactor);
-            this.speed= speed;
+            speed*= alignmentFactor;
+            //driveMotor.setPower(speed * alignmentFactor);
+            this.targetSpeed= speed;
         }
 
 
@@ -131,7 +148,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             return steeringServo.getTargetPos() * 360.0;
         }
         public double getTargetPower(){
-            return this.speed;
+            return this.targetSpeed;
         }
 
         public double getDriveSpeed() {
@@ -143,17 +160,23 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             steeringServo.setAngle(angle);
         }
 
+        public void write(){
+            driveMotor.setPower(targetSpeed);
+            steeringServo.setAngle(targetAngle);
+            steeringServo.update();
+        }
 
         public void setCoefs(PDSFCoefficients coefs) {
             steeringServo.setCoefs(coefs.p, coefs.d, coefs.s, coefs.f);
         }
     }
     public boolean ok= false;
-    PIDFController headingController;
+    public PIDFController headingController;
 
     double lastFRangle= 0, lastFLangle= 0, lastBRangle= 0, lastBLangle= 0;
     volatile boolean running= false;
     volatile double lastAngle;
+
     public void startUpdateThread(){
         Robot r= Robot.getInstance();
         headingController= new PIDFController(Constants.strafe.getP(), Constants.strafe.getI(), Constants.strafe.getD(), Constants.strafe.getF());
@@ -230,20 +253,59 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     }
     public double rot;
     public void setHeadingController(){
-        headingController= new PIDFController(Constants.pHeading , Constants.strafe.getI(), Constants.dHeading * 1.2, Constants.strafe.getF());
+        headingController= new PIDFController(0.1 , Constants.strafe.getI(), 0.001, Constants.strafe.getF());
 
     }
+    boolean joystickRot= false;
 
-    @Override
-    public void update(double strafeX, double strafeY, double rotation) {
+
+    public void stopChassisThread(){
+        running= false;
+    }
+    volatile ElapsedTime timer;
+
+    public void startChassisThread(){
+      //  final GamepadLimiter limiter1= new GamepadLimiter(strafeX, strafeY, rotation, 6);
+        timer= new ElapsedTime();
+        running= true;
+        new Thread(()->{
+            while (running && !Thread.currentThread().isInterrupted())
+            {
+                try{
+                    update();
+                    Thread.sleep(1);
+                }
+                catch (InterruptedException e){
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }).start();
+
+    }
+    volatile public DoubleSupplier leftX, leftY, rightX;
+    volatile GamepadLimiter limiter;
+    public void setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX){
+        this.leftX= leftX;
+        this.leftY= leftY;
+        this.rightX= rightX;
+        limiter= new GamepadLimiter(leftX, leftY, rightX, 6);
+    }
+
+    public volatile double hz;
+    public void update() {
+
+
 
         if(headingController== null){
-            headingController= new PIDFController(Constants.pHeading , Constants.strafe.getI(), Constants.dHeading * 1.2, Constants.strafe.getF());
+            headingController= new PIDFController(0.012 , Constants.strafe.getI(), 0.0015, Constants.strafe.getF());
         }
         if(trackWidth== 0)
             throw new IllegalArgumentException("Track Width nesetat");
         if(wheelBase== 0)
             throw new IllegalArgumentException("Wheel Base nesetat");
+        double rotation= limiter.getRightX();
+        double strafeX= limiter.getLeftX();
+        double strafeY= limiter.getLeftY();
         if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
             radius= hypot(wheelBase, trackWidth);
             //double heading= robot.odo.getHeading(AngleUnit.DEGREES);
@@ -253,11 +315,17 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             if(Math.abs(rotation)>.1){
                 rotation*= -1.15;
                 lastAngle= robot.robotHeading;
+                joystickRot= true;
             }
             else{
-                rotation= headingController.calculate(robot.robotHeading, lastAngle);
+                double diff= MathStuff.normalizeDegrees(robot.robotHeading- lastAngle);
+                rotation= -headingController.calculate(0, diff);
+                if(Math.abs(rotation)< .1)
+                    rotation= 0;
             }
             rot= rotation;
+//            if(joystickRot)
+//                strafeY*=.6;
             double a = strafeX + rotation * (wheelBase / radius),
                     b = strafeX - rotation * (wheelBase / radius),
                     c = strafeY + rotation * (trackWidth / radius),
@@ -302,6 +370,41 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
     }
+
+    public void write(){
+        if(timer== null)
+            timer= new ElapsedTime();
+        hz= 1/timer.seconds();
+        timer.reset();
+        fl.write();
+        fr.write();
+        bl.write();
+        br.write();
+    }
+    public void update(double s, double f, double r) {
+
+    }
+    volatile boolean writeThreadRunning= false;
+    public void startWriteThread(){
+        writeThreadRunning= true;
+        Thread t= new Thread(()->{
+            while (writeThreadRunning && !Thread.interrupted()){
+                try{
+                    this.write();
+                    Thread.sleep(1);
+                }
+                catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+        t.setPriority(Thread.MAX_PRIORITY);
+        t.start();
+    }
+    public void stopWriteThread(){
+        writeThreadRunning= false;
+    }
+
     @Override
     public void updateAuto(double strafeX, double strafeY, double rotation) {
 

@@ -27,7 +27,7 @@ public class HeadingTuning extends LinearOpMode {
     Telemetry t;
     ElapsedTime time;
     SwerveDrivetrain swerveDrivetrain;
-    Pose p= new Pose(24, -48, Math.toRadians(45));
+    Pose p= new Pose();
     @Override
     public void runOpMode() throws InterruptedException {
         t= this.telemetry;
@@ -52,7 +52,15 @@ public class HeadingTuning extends LinearOpMode {
                 drive.turnTo(Math.toRadians(180));
             if(gamepad1.dpadLeftWasPressed())
                 drive.turnTo(Math.toRadians(0));
+            t.addData("delta unghi", Localizer.normalizeHeading(drive.targetPosition.getTheta()- drive.targetHeading));
+            t.addData("tru tru",             !Constants.useSecondaryHeading || Localizer.normalizeHeading(drive.currentPose.getTheta()- drive.targetPosition.getTheta())> Constants.headingThreshold );
+            t.addData("heading error", drive.hError);
+            t.addData("x", drive.xRotated);
+            t.addData("y", drive.yRotated);
+            t.addData("theta", drive.theta);
 
+
+            t.update();
             drive.update();
             robot.update();
 

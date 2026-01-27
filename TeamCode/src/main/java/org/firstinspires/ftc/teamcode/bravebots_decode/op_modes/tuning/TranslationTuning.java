@@ -25,7 +25,7 @@ public class TranslationTuning extends LinearOpMode {
     Telemetry t;
     ElapsedTime time;
     SwerveDrivetrain swerveDrivetrain;
-    Pose p= new Pose(24, -48, Math.toRadians(45));
+    Pose p= new Pose(48, 0, Math.toRadians(0));
     @Override
     public void runOpMode() throws InterruptedException {
         t= this.telemetry;
@@ -41,8 +41,11 @@ public class TranslationTuning extends LinearOpMode {
         swerveDrivetrain.setCoefs(new PDSFCoefficients(3,0.5,0,0));
         drive.drivetrain.setTrackWidth(34.4);
         drive.drivetrain.setWheelBase(26.8);
+        drive.localizer.resetLocalizer();
+        drive.setStartingPosition(new Pose());
         waitForStart();
         //drive.startChassisThread2();
+
         time= new ElapsedTime();
         while (opModeIsActive()){
 

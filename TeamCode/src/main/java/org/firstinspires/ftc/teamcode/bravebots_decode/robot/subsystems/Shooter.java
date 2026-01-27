@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMoto
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
 
 public class Shooter implements SubsystemInterface{
-    BetterMotorEx m;
-    BetterServo s;
+    public static BetterMotorEx m;
+    public static BetterServo s;
     private final double minInput= 0, maxInput= 0, minVelOutput= 0, maxVelOutput= 0, minPosOutput= 0, maxPosOutput= 0;
     public static double p,i,d,f;
     boolean shooting= false, set= false, velocitySet= false;

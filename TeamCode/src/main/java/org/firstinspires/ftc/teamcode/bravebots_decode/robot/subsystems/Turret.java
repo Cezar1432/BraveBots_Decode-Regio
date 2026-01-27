@@ -11,12 +11,13 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
 
 @Configurable
 public class Turret {
     public static BetterCRServo s1, s2;
-    public static BetterMotorEx m;
+    public static BetterMotor m;
     public static double p = 0.02, d = 0.0006, i = 0.05, f = 0, st = 0;
     private static double  lastAngle;
     public static double GEAR_RATIO= 1.05;

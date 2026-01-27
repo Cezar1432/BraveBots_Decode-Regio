@@ -5,14 +5,22 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServ
 import java.util.LinkedList;
 import java.util.List;
 
-public class Spindexer implements SubsystemInterface{
+public class Spindexer{
 
-     BetterServo s1, s2;
+     public static BetterServo s1, s2;
 
-    @Override
-    public void update() {
+     public static void shootRandom(){
+//         s1.setMaxDegrees(1100);
+//         s2.setMaxDegrees(1100);
+            s1.turn( 360);
+            s2.setPosition(s1.getPosition());
+     }
 
-    }
+     public static void turnBack(){
+         s1.turn(-360);
+         s2.turnToAngle(s2.getPosition());
+     }
+
 
 
 
