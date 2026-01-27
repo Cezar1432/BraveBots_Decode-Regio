@@ -12,14 +12,12 @@ public class Spindexer{
      public static void shootRandom(){
 //         s1.setMaxDegrees(1100);
 //         s2.setMaxDegrees(1100);
-         //s1.turn( 360);
-         s1.setPosition(1);
+         s1.turn( 360);
           //  s2.setPosition(s1.getPosition());
      }
 
      public static void turnBack(){
-         s1.setPosition(0);
-       //  s2.turnToAngle(s2.getPosition());
+         s1.turn(-360);
      }
 
 
