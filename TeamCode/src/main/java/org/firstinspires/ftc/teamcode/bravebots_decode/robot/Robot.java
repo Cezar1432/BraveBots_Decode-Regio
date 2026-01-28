@@ -50,7 +50,7 @@ public class Robot {
     List<LynxModule> hubs;
     LynxModule controlHub, expansionHub;
     OpenCvCamera camera;
-    Limelight3A ll;
+    public Limelight3A ll;
     static Robot instance;
 
     public static Robot getInstance(){
@@ -124,6 +124,8 @@ public class Robot {
         ll= hm.get(Limelight3A.class, "ll");
         int pipeline= a== Alliance.RED ? 2 : 9;
         ll.pipelineSwitch(2);
+        ll.setPollRateHz(100);
+        ll.start();
         //WebcamName name= hm.get(WebcamName.class, "camera");
         //camera= OpenCvCameraFactory.getInstance().createWebcam(name);
 

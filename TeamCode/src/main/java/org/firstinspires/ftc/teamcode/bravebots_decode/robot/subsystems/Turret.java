@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -20,6 +21,8 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
+
+import java.util.List;
 
 public class Turret {
 
@@ -251,13 +254,21 @@ public class Turret {
         try {
             LLResult res = LimelightMath.getResults();
             if (res != null && res.isValid()) {
-                allignedbylimelight = true;
-                pose = res.getBotpose_MT2();
-                positionll = pose.getPosition();
-                if (positionll.x != 0 && positionll.y != 0) {
-                    Robot.odo.setPosX(positionll.y, DistanceUnit.METER);
-                    Robot.odo.setPosY(-positionll.x, DistanceUnit.METER);
-                }
+               List<LLResultTypes.FiducialResult> fiducials = res.getFiducialResults();
+               for(LLResultTypes.FiducialResult fiduci : fiducials)
+               {
+                   int apriltagID = fiduci.getFiducialId();
+                   if((Robot.a == Alliance.RED && apriltagID == 24) || (Robot.a == Alliance.BLUE && apriltagID ==20))
+                   {
+                       allignedbylimelight = true;
+                       pose = res.getBotpose_MT2();
+                       positionll = pose.getPosition();
+                       if (positionll.x != 0 && positionll.y != 0) {
+                           Robot.odo.setPosX(positionll.y, DistanceUnit.METER);
+                           Robot.odo.setPosY(-positionll.x, DistanceUnit.METER);
+                       }
+                   }
+               }
             }
         }
         catch (Throwable e){

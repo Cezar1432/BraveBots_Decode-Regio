@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
 
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoController;
@@ -14,10 +16,13 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.logic.TeleOpLogic;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 @TeleOp
 public class BetterSwerveOpMode extends LinearOpMode {
@@ -60,6 +65,21 @@ public class BetterSwerveOpMode extends LinearOpMode {
             long now = System.nanoTime();
             telemetry.addData("hz", 1e9/(now- last));
             last= now;
+            LLResult res = LimelightMath.getResults();
+            telemetry.addData("isValid",res.isValid());
+            telemetry.addData("isValid2",robot.ll.getLatestResult().isValid());
+            if (res != null && res.isValid()) {
+                List<LLResultTypes.FiducialResult> fiducials = res.getFiducialResults();
+                int i = 1;
+                for (LLResultTypes.FiducialResult fiduci : fiducials) {
+                    int apriltagID = fiduci.getFiducialId();
+                    telemetry.addData("apriltag "+i,apriltagID);
+                    i++;
+                }
+
+//                telemetry.addData("LLx",res.getBotpose_MT2().getPosition().x);
+//                telemetry.addData("LLy",res.getBotpose_MT2().getPosition().y);
+            }
             telemetry.addData("x", Robot.odo.getPosX(DistanceUnit.METER));
             telemetry.addData("y", Robot.odo.getPosY(DistanceUnit.METER));
             telemetry.addData("heading", Robot.odo.getHeading(AngleUnit.DEGREES));
