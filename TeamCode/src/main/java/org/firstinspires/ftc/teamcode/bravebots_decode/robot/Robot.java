@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
@@ -33,7 +34,7 @@ import javax.microedition.khronos.egl.EGL;
 
 public class Robot {
 
-    public GoBildaPinpointDriver odo;
+    public static GoBildaPinpointDriver odo;
 
 
     public volatile BetterMotor leftFront, rightFront, leftBack, rightBack, turret, intake;
@@ -43,7 +44,7 @@ public class Robot {
     public volatile BetterCRServo fl, bl, fr, br;
     public BetterServo indexer1, indexer2, hood;
     public AnalogInputController expansionHubAnalogInputController, controlHubAnalogInputController;
-    public Alliance a;
+    public static Alliance a= null;
     public HardwareMap hm;
     public Telemetry t;
     List<LynxModule> hubs;
@@ -100,6 +101,7 @@ public class Robot {
         Shooter.s= hood;
         Spindexer.s1= indexer1;
         Turret.m= turret;
+        LimelightMath.ll = ll;
     }
 
     public void initializeServos(){
@@ -119,17 +121,18 @@ public class Robot {
         odo.setOffsets(11.1, -5, DistanceUnit.CM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //ll= hm.get(Limelight3A.class, "ll");
+        ll= hm.get(Limelight3A.class, "ll");
         int pipeline= a== Alliance.RED ? 2 : 9;
-        //ll.pipelineSwitch(pipeline);
+        ll.pipelineSwitch(2);
         //WebcamName name= hm.get(WebcamName.class, "camera");
         //camera= OpenCvCameraFactory.getInstance().createWebcam(name);
 
     }
-    public double robotHeading= 0;
+    public double updatedHeading= 0, robotHeading = 0;
     public void initialize(){
 
-        instance= t== null? new Robot(this.hm, this.a) : new Robot(this.hm, this.t, this.a);
+        //instance= t== null? new Robot(this.hm, this.a) : new Robot(this.hm, this.t, this.a);
+        instance= this;
         hubs= hm.getAll(LynxModule.class);
         hubs.forEach((hub)-> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
      //   hubs.forEach(LynxModule::stopBlinking);
@@ -144,6 +147,7 @@ public class Robot {
         initializeRest();
         assignHardware();
     }
+
     ElapsedTime timer;
     public void update(){
         if(timer== null)
@@ -153,8 +157,9 @@ public class Robot {
 
 
         odo.update();
-        robotHeading= odo.getHeading(AngleUnit.DEGREES);
-
+        robotHeading = odo.getHeading(AngleUnit.DEGREES);
+        updatedHeading = LimelightMath.getLimelightUpdateAngle();
+        ll.updateRobotOrientation(updatedHeading);
     }
 
 

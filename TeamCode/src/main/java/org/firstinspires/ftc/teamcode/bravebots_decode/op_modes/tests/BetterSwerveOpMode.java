@@ -1,14 +1,18 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
 
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.logic.TeleOpLogic;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
@@ -39,6 +43,7 @@ public class BetterSwerveOpMode extends LinearOpMode {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         waitForStart();
 
+        Turret.reset();
         logic.startThreads();
         while (opModeIsActive()){
 
@@ -49,12 +54,19 @@ public class BetterSwerveOpMode extends LinearOpMode {
             if(gamepad1.squareWasPressed())
                 s.setPosition(0);
 
+
             robot.update();
             logic.write();
             long now = System.nanoTime();
             telemetry.addData("hz", 1e9/(now- last));
-            telemetry.update();
             last= now;
+            telemetry.addData("x", Robot.odo.getPosX(DistanceUnit.METER));
+            telemetry.addData("y", Robot.odo.getPosY(DistanceUnit.METER));
+            telemetry.addData("heading", Robot.odo.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("xCorner", Turret.xCorner);
+            telemetry.addData("yCorner", Turret.yCorner);
+            telemetry.update();
+
 
 
         }

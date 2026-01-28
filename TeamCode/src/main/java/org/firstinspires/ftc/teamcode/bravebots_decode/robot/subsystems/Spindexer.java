@@ -16,8 +16,32 @@ public class Spindexer{
           //  s2.setPosition(s1.getPosition());
      }
 
+     public enum Slots{
+         SLOT_1(0,0), SLOT_2(0,0), SLOT_3(0,0);
+
+         double frontPose, shootPose;
+         Slots(double frontPose, double shootPose){
+             this.frontPose= frontPose;
+             this.shootPose= shootPose;
+         }
+
+     }
+
+     public static void turnTo(Slots slot){
+         s1.setPosition(slot.frontPose);
+     }
+     public static void shootSlot(Slots slot){
+         s1.setPosition(slot.shootPose);
+     }
      public static void turnBack(){
-         s1.turn(-360);
+         turnTo(Slots.SLOT_1);
+     }
+
+     public static void turnManuallyToRight(){
+         s1.turn(120);
+     }
+     public static void turnManuallyToLeft(){
+         s1.turn(-120);
      }
 
 

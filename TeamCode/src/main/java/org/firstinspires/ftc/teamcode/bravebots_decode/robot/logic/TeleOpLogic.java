@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.ShootRandom;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
@@ -37,6 +38,12 @@ public class TeleOpLogic {
         if(gp1.circleWasPressed())
             s.addTask(new ShootRandom());
 
+        if(gp1.dpadLeftWasPressed())
+            Spindexer.turnManuallyToLeft();
+        if(gp1.dpadRightWasPressed())
+            Spindexer.turnManuallyToRight();
+
+
         s.update();
     }
     public void startThreads(){
@@ -47,7 +54,8 @@ public class TeleOpLogic {
                 try {
                     drive.update();
                     updateLogic();
-                    Thread.sleep(5);
+                    Turret.update();
+                    Thread.sleep(7);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -64,6 +72,7 @@ public class TeleOpLogic {
     }
     public void write(){
         drive.write();
+        Turret.write();
     }
 
 }

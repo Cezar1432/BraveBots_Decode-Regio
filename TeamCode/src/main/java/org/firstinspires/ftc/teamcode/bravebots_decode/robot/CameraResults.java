@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems;
+package org.firstinspires.ftc.teamcode.bravebots_decode.robot;
 
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.SubsystemInterface;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
