@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.robot;
 
-import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.SubsystemInterface;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
@@ -10,12 +9,12 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class CameraResults implements SubsystemInterface {
+public class CameraResults{
 
     public static OpenCvCamera camera;
     public static volatile boolean opened, starting, streaming; //??
     volatile Mat currentFrame;
-    private static final int WIDTH= 960, HEIGHT= 600, MINIMUM_PIXELS= 20000;
+    private static final int WIDTH= 960, HEIGHT= 600, MINIMUM_PIXELS= 200000;
     //    static Mat hsv;
 //    static Mat green, purple;
     public static ReentrantLock lock;

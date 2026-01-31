@@ -4,20 +4,17 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexe
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
 
-public class ShootRandom implements Task {
+public class WaitForIndexer implements Task {
     private final Scheduler s;
-    public ShootRandom(){
+    public WaitForIndexer(Spindexer.Slots slot){
         s= new Scheduler();
-        s.addTask(()->{
-            Spindexer.shootRandom();
-            return true;
+        s.addTask(()-> {
+                    Spindexer.turnTo(slot);
+                    Spindexer.inSlot = true;
+                })
+                .waitSeconds(1)
+                .addTask(()->Spindexer.inSlot= false);
 
-        })
-                .waitSeconds(1.2)
-                .addTask(()->{
-                    Spindexer.turnBack();
-                    return true;
-                });
     }
     @Override
     public boolean Run() {

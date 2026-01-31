@@ -55,5 +55,11 @@ public class Pose {
     public Pose getPose(){
        return this;
     }
+    public static double[] polarToCartesian(double r, double theta) {
+        return new double[]{r * Math.cos(theta), r * Math.sin(theta)};
+    }
+    public static double[] cartesianToPolar(double x, double y) {
+        return new double[] {Math.sqrt(x * x + y * y), MathStuff.normalizeRadians(Math.atan2(y, x))};
+    }
 }
 

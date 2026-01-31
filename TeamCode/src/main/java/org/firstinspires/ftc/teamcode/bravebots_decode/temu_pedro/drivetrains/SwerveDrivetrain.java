@@ -118,8 +118,10 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
             // Calculate shortest path
             double diff = angle - currentAngle;
-            while (diff > 180) diff -= 360;
-            while (diff < -180) diff += 360;
+//            while (diff > 180) diff -= 360;
+//            while (diff < -180) diff += 360;
+
+            diff%= 360;
 
             if (Math.abs(diff) > 90) {
                 diff = diff > 0 ? diff - 180 : diff + 180;

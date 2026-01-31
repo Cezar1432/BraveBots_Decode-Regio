@@ -7,8 +7,11 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.AnalogInputController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -22,9 +25,11 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexe
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterColorSensor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetterServo;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
@@ -37,14 +42,18 @@ public class Robot {
     public static GoBildaPinpointDriver odo;
 
 
-    public volatile BetterMotor leftFront, rightFront, leftBack, rightBack, turret, intake;
-    public BetterMotorEx shooter;
+    DcMotorControllerEx exExpansionHubMotors;
+    public volatile BetterMotor leftFront, rightFront, leftBack, rightBack, turret;
+    public BetterMotorEx intake;
+    public DcMotorEx shooter;
     public DcMotorController controlHubMotors, expansionHubMotors;
     public ServoController controlHubServos, expansionHubServos;
     public volatile BetterCRServo fl, bl, fr, br;
-    public BetterServo indexer1, indexer2, hood;
+    public BetterServo indexer1, indexer2;
+    public EvenBetterServo hood;
     public AnalogInputController expansionHubAnalogInputController, controlHubAnalogInputController;
     public static Alliance a= null;
+    BetterColorSensor colorSensor;
     public HardwareMap hm;
     public Telemetry t;
     List<LynxModule> hubs;
@@ -52,6 +61,7 @@ public class Robot {
     OpenCvCamera camera;
     public Limelight3A ll;
     static Robot instance;
+    public static VoltageSensor voltageSensor;
 
     public static Robot getInstance(){
         return instance;
@@ -77,7 +87,7 @@ public class Robot {
         expansionHubServos= hm.get(ServoController.class, "Expansion Hub 2");
         controlHubAnalogInputController= hm.get(AnalogInputController.class, "Control Hub");
         expansionHubAnalogInputController= hm.get(AnalogInputController.class, "Expansion Hub 2");
-
+        exExpansionHubMotors= hm.get(DcMotorControllerEx.class, "Expansion Hub 2");
 
 
     }
@@ -89,10 +99,11 @@ public class Robot {
         rightBack= new BetterMotor(controlHubMotors, 1);
         turret= new BetterMotor(controlHubMotors, 2);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intake= new BetterMotor(expansionHubMotors, 2);
+        intake= new BetterMotorEx(expansionHubMotors, 2);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shooter= new BetterMotorEx(expansionHubMotors, 3);
+        shooter= hm.get(DcMotorEx.class, "shooter");
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
     private void assignHardware(){
@@ -100,8 +111,10 @@ public class Robot {
         Shooter.m= shooter;
         Shooter.s= hood;
         Spindexer.s1= indexer1;
+        Spindexer.colorSensor= colorSensor;
         Turret.m= turret;
         LimelightMath.ll = ll;
+
     }
 
     public void initializeServos(){
@@ -111,8 +124,8 @@ public class Robot {
         fr= new BetterCRServo(controlHubServos, 0, controlHubAnalogInputController, 1);
         br= new BetterCRServo(controlHubServos, 1, controlHubAnalogInputController, 0);
         indexer1= new BetterServo(controlHubServos, 2);
-        indexer1.setMaxDegrees(1100);
-        hood= new BetterServo(expansionHubServos, 2);
+        indexer1.setMaxDegrees(1065);
+        hood= new EvenBetterServo(expansionHubServos, 2);
 
     }
 
@@ -121,6 +134,9 @@ public class Robot {
         odo.setOffsets(11.1, -5, DistanceUnit.CM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        colorSensor= hm.get(BetterColorSensor.class, "color sensor");
+
+
         ll= hm.get(Limelight3A.class, "ll");
         int pipeline= a== Alliance.RED ? 2 : 9;
         ll.pipelineSwitch(2);

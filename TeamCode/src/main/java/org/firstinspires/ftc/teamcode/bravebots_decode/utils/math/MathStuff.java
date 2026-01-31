@@ -15,4 +15,9 @@ public class MathStuff {
         while (radians< -Math.PI) radians+= 2* Math.PI;
         return radians;
     }
+    public static double clamp(double num, double lower, double upper) {
+        if (num < lower) return lower;
+        if (num > upper) return upper;
+        return num;
+    }
 }

@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems;
 
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
 
 public class Intake {
-    public static BetterMotor motor;
+    public static BetterMotorEx motor;
     static boolean intaking = false;
     public static void start(){
         motor.setPower(-1);

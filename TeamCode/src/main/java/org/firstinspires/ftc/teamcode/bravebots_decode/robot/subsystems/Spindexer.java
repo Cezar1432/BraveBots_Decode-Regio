@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems;
 
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterColorSensor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
 
 import java.util.LinkedList;
@@ -12,20 +14,24 @@ public class Spindexer{
      public static void shootRandom(){
 //         s1.setMaxDegrees(1100);
 //         s2.setMaxDegrees(1100);
-         s1.turn( 360);
-          //  s2.setPosition(s1.getPosition());
+         s1.setPosition(1);
+          //  s2.setPosition(s31.getPosition());
      }
 
      public enum Slots{
-         SLOT_1(0,0), SLOT_2(0,0), SLOT_3(0,0);
+         SLOT_1(0.48,0), SLOT_2(.344,0), SLOT_3(.215,0);
 
-         double frontPose, shootPose;
+         final double frontPose, shootPose;
+        // final double shootPose;
          Slots(double frontPose, double shootPose){
              this.frontPose= frontPose;
              this.shootPose= shootPose;
          }
 
      }
+
+     static Scheduler s= new Scheduler();
+
 
      public static void turnTo(Slots slot){
          s1.setPosition(slot.frontPose);
@@ -35,7 +41,12 @@ public class Spindexer{
      }
      public static void turnBack(){
          turnTo(Slots.SLOT_1);
+         currentSlot= Slots.SLOT_1;
      }
+
+     public static double minimumTime= 800;
+     static double lastTime= 0;
+     public static Slots currentSlot= Slots.SLOT_1;
 
      public static void turnManuallyToRight(){
          s1.turn(120);
@@ -44,7 +55,36 @@ public class Spindexer{
          s1.turn(-120);
      }
 
+     public static boolean sorting= false;
+     public static void setSorting(boolean set){
+         sorting= set;
+     }
+     public static boolean testBoolean;
+     public static BetterColorSensor colorSensor;
+     public static boolean inSlot= false;
 
+     public static double BallInDist= 10;
+     public static void update(){
+         if(Intake.intaking){
+             if(sorting){
+                 throw new IllegalArgumentException("nu stim sa sortam inca");
+             }
+             else{
+                 double dist= colorSensor.getDistanceInCM();
+                 testBoolean= dist< BallInDist;
+                 if(System.currentTimeMillis()- lastTime> minimumTime && testBoolean && currentSlot!= Slots.SLOT_3){
+
+                     lastTime= System.currentTimeMillis();
+                     if(currentSlot== Slots.SLOT_1)
+                         currentSlot= Slots.SLOT_2;
+                     else if(currentSlot== Slots.SLOT_2)
+                         currentSlot= Slots.SLOT_3;
+
+                     turnTo(currentSlot);
+                 }
+             }
+         }
+     }
 
 
 }

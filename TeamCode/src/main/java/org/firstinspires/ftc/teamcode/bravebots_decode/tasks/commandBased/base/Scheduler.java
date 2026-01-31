@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base;
 import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveDriveKinematics;
 
 
+import org.firstinspires.ftc.robotcore.external.Consumer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantAsync;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantSync;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToLinearAsync;
@@ -41,6 +42,17 @@ public class Scheduler {
     public Scheduler addTask(Task t){
         queue.addLast(t);
         return this;
+    }
+    public Scheduler addTask(InstantTask t){
+        Task task= () -> {
+            t.run();
+            return true;
+        };
+        queue.addLast(task);
+        return this;
+    }
+    public interface InstantTask{
+        void run();
     }
     @Deprecated
     public boolean justDone(){

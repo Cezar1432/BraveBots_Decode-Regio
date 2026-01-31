@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
@@ -46,6 +47,11 @@ public class BetterMotorEx extends DcMotorImplEx implements DcMotorEx, HardwareD
         time= new ElapsedTime();//aaa
 
     }
+    public BetterMotorEx(DcMotorControllerEx controllerEx, int portNumber){
+        super(controllerEx, portNumber);
+        time= new ElapsedTime();
+    }
+
 
     public enum RunMode{
         RUN, PID, VELOCITY_PID
@@ -73,6 +79,9 @@ public class BetterMotorEx extends DcMotorImplEx implements DcMotorEx, HardwareD
             throw new RuntimeException("Ticks rer revolution not set!");
         targetRPM= rpm;
         runMode= RunMode.VELOCITY_PID;
+    }
+
+    public void setTicksPerRevolution(double ticks){
     }
     double cnt  = 0,sum  = 0, avg;
 
