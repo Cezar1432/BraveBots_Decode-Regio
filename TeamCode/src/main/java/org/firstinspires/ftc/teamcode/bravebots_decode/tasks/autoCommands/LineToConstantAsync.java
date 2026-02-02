@@ -19,9 +19,11 @@ public class LineToConstantAsync implements Task {
 
     @Override
     public boolean Run() {
-        if(!started)
+        if(!started) {
             c.lineToConstant(p);
-        c.update();
+            started= true;
+        }
+        //c.update();
         return c.finished();
     }
 }

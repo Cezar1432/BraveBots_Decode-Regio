@@ -23,6 +23,9 @@ public class MecanumDrivetrain implements DrivetrainInterface {
     }
 
 
+    public void write(){
+
+    }
 
 
     public enum Actions{

@@ -20,13 +20,13 @@ public class GamepadLimiter {
         mode= Mode.GP;
     }
     DoubleSupplier leftStickX, leftStickY, rightStickX;
-    public GamepadLimiter(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX, double limiter){
+    public GamepadLimiter(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX, double limiter1, double limiter2, double limiter3){
        leftStickX= leftX;
        leftStickY= leftY;
        rightStickX= rightX;
-       this.leftX= new SlewRateLimiter(limiter);
-       this.leftY= new SlewRateLimiter(limiter);
-       this.rightX= new SlewRateLimiter(limiter);
+       this.leftX= new SlewRateLimiter(limiter1);
+       this.leftY= new SlewRateLimiter(limiter2);
+       this.rightX= new SlewRateLimiter(limiter3);
        mode= Mode.SUPPLIER;
 
     }

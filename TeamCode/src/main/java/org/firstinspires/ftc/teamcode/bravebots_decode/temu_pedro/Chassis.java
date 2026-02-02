@@ -129,6 +129,22 @@ public class Chassis implements Runnable{
             drivetrain= new SwerveDrivetrain(robot);
     }
 
+    public Chassis(Robot robot, Control control, Localizers localizer, Drivetrain chassis){
+        initializeMotors(robot);
+        this.gp = gp;
+        //localizer= new PinpointV1(robot);
+        this.control= control;
+        if(localizer== Localizers.PINPOINT_V1)
+            this.localizer= new PinpointV1(robot);
+        else
+            this.localizer= new PinpointV1(robot);
+
+        if(chassis== Drivetrain.MECANUM)
+            drivetrain= new MecanumDrivetrain(robot);
+        else
+            drivetrain= new SwerveDrivetrain(robot);
+    }
+
 
 
     volatile Gamepad gp;
@@ -411,7 +427,8 @@ public class Chassis implements Runnable{
 
                 targetHeading = PinpointV1.normalizeHeading(targetHeading);
 
-                drivetrain.updateAuto(yRotated * maxPower, xRotated * maxPower, -theta * maxPower);
+                drivetrain.updateAuto(yRotated * maxPower, -xRotated * maxPower, theta * maxPower);
+                drivetrain.write();
 
             }
         }

@@ -16,8 +16,10 @@ public class LineToConstantSync implements Task {
 
     @Override
     public boolean Run() {
-        if(!started)
+        if(!started) {
             c.lineToConstant(p);
+            started= true;
+        }
         c.update();
         return true;
     }

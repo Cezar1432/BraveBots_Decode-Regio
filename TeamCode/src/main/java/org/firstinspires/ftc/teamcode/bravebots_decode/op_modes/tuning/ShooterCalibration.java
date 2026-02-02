@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.logic.TeleOpLogic;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
@@ -28,6 +29,7 @@ public class ShooterCalibration extends LinearOpMode {
             s.addTask(()-> {
                                 Shooter.m.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(.8,0,0,14.5));
                                 Shooter.m.setVelocity(-vel);
+                        Intake.start();
 
                             })
                     .addTask(()->Math.abs(Math.abs(Shooter.m.getVelocity())- Math.abs(vel))< Shooter.velocityThreshold)

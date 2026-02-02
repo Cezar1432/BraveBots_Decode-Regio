@@ -25,13 +25,18 @@ public class SlewRateLimiter {
     public double calculate(double input) {
 
         if (!firstRun) {
-            double deltaTime = timer.seconds();
-            timer.reset();
-            double maxChange = deltaTime * limiter;
-            if (Math.abs(input - lastValue) > maxChange)
-                lastValue += maxChange * Math.signum(input - lastValue);
-            else
+            if(limiter< 15) {
+                double deltaTime = timer.seconds();
+                timer.reset();
+                double maxChange = deltaTime * limiter;
+                if (Math.abs(input - lastValue) > maxChange)
+                    lastValue += maxChange * Math.signum(input - lastValue);
+                else
+                    lastValue = input;
+            }
+            else{
                 lastValue= input;
+            }
             return lastValue;
 
         }

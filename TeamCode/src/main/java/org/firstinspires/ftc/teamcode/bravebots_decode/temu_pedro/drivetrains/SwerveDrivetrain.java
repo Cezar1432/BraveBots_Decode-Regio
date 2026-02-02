@@ -66,6 +66,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     }
     volatile Gamepad gp;
     volatile GamepadLimiter gamepadLimiter;
+
+
     public SwerveDrivetrain(Robot robot, Gamepad gp, double limiter){
         this.robot= robot;
         initialize(robot);
@@ -142,7 +144,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             this.targetAngle= currentAngle + diff;
 
             double alignmentFactor=  1 - Math.abs(diff)/90;
-
+//            //alignmentFactor= Math.min(1.5 * alignmentFactor, 1);
             speed*= alignmentFactor;
             //driveMotor.setPower(speed * alignmentFactor);
             this.targetSpeed= speed;
@@ -301,7 +303,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         this.leftX= leftX;
         this.leftY= leftY;
         this.rightX= rightX;
-        limiter= new GamepadLimiter(leftX, leftY, rightX, 6);
+        limiter= new GamepadLimiter(leftX, leftY, rightX, 6, 6, 20);
         return this;
     }
 
@@ -469,9 +471,9 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             }
 
             fl.setState(flSpeed, toDegrees(flAngle));
-            fr.setState(frSpeed, toDegrees(frAngle));
+            fr.setState(-frSpeed, toDegrees(frAngle));
             bl.setState(brSpeed, toDegrees(blAngle));
-            br.setState(blSpeed, toDegrees(brAngle));
+            br.setState(-blSpeed, toDegrees(brAngle));
 
             lastFLangle = flAngle;
             lastFRangle = frAngle;

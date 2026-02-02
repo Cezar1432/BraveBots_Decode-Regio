@@ -12,5 +12,6 @@ public interface DrivetrainInterface {
     DrivetrainInterface setCoefs(PDSFCoefficients c);
     DrivetrainInterface setTrackWidth(double trackWith);
     DrivetrainInterface setWheelBase(double wheelBase);
+    void write();
    // boolean ok= false;
 }

@@ -23,7 +23,7 @@ public class Spindexer{
      }
 
      public enum Slots{
-         SLOT_1(0.5322,0), SLOT_2(.4177,0), SLOT_3(.2878,0);
+         SLOT_1(0.4656,0), SLOT_2(.345,0), SLOT_3(.2217,0);
 
          final double frontPose, shootPose;
         // final double shootPose;
@@ -38,7 +38,7 @@ public class Spindexer{
 
 
      public static void turnTo(Slots slot){
-         s1.setPosition(slot.frontPose);
+         setPosition(slot.frontPose);
          currentSlot= slot;
      }
      public static void shootSlot(Slots slot){

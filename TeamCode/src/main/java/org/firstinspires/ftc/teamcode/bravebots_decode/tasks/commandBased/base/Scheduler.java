@@ -39,6 +39,11 @@ public class Scheduler {
         return queue.size();
     }
 
+    public Scheduler addChassis(Chassis chassis){
+        this.f= chassis;
+        return this;
+    }
+
     public Scheduler addTask(Task t){
         queue.addLast(t);
         return this;
@@ -68,6 +73,7 @@ public class Scheduler {
         queue.addFirst(new Wait(sec));
         return this;
     }
+
     public void removeAllTasks(){
         queue= new LinkedList<>();
     }

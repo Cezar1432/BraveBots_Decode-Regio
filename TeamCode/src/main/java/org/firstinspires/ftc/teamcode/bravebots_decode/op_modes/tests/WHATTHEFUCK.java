@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 
+import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
 
 import java.util.LinkedList;
@@ -23,8 +25,10 @@ public class WHATTHEFUCK extends LinearOpMode {
 //    DcMotorControllerEx controllerEx;
 //    List<LynxModule> hubs= new LinkedList<>();
 //    Thread t;
-    DcMotor m;
-    volatile boolean running = false;
+
+    Robot r;
+    long now, last;
+    double hz;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -57,11 +61,17 @@ public class WHATTHEFUCK extends LinearOpMode {
 //        }
 //
 //    }
-        m= hardwareMap.get(DcMotor.class, "shooter");
+        r= new Robot(hardwareMap, telemetry, Alliance.BLUE);
+        r.initialize();
+        telemetry.setMsTransmissionInterval(1000);
+
         waitForStart();
         while (opModeIsActive()){
-            telemetry.addData("ticks", m.getCurrentPosition());
+            now= System.nanoTime();
+            telemetry.addData("hz", 1e9/(now- last));
             telemetry.update();
+            r.update();
+            last= now;
         }
     }
 }

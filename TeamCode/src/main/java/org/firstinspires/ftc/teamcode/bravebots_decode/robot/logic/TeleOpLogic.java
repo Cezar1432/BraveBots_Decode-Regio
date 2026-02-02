@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.robot.logic;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -13,27 +12,48 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexe
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.ShootForta;
-import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.ShootForta2;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 public class TeleOpLogic {
     Robot robot;
     public SwerveDrivetrain drive;
     Gamepad gp1, gp2;
+    BetterGamepad gp;
 
     public TeleOpLogic(Robot robot, Gamepad gp1, Gamepad gp2) {
         this.robot = robot;
         this.gp1 = gp1;
         this.gp2 = gp2;
+        gp= new BetterGamepad(this.gp1);
+
         drive = new SwerveDrivetrain(robot)
                 .setWheelBase(26.7)
                 .setTrackWidth(34.4)
                 .setCoefs(new PDSFCoefficients(3, 0.5, 0, 0))
-                .setSuppliers(() -> this.gp1.left_stick_x, () -> this.gp1.left_stick_y, () -> this.gp1.right_stick_x);
+                .setSuppliers(() -> this.gp.getDouble(BetterGamepad.Trigger.LEFT_X), () -> this.gp.getDouble(BetterGamepad.Trigger.LEFT_Y), () -> this.gp.getDouble(BetterGamepad.Trigger.RIGHT_X));
 
 
         s = new Scheduler();
+        gp.getButton(BetterGamepad.Buttons.CROSS).whenPressed(Intake::toggle);
+        gp.getButton(BetterGamepad.Buttons.TOUCHPAD).whenPressed(()->{
+                    if (Robot.a == Alliance.BLUE) {  //Robot.pp.resetPosAndIMU();
+                        Robot.odo.setPosX(-12.44 / 2, DistanceUnit.INCH);
+                        Robot.odo.setPosY(16.93 / 2, DistanceUnit.INCH);
+                    } else {
+                        Robot.odo.setPosX(12.44 / 2, DistanceUnit.INCH);
+                        Robot.odo.setPosY(16.93 / 2, DistanceUnit.INCH);
+                    }
+                    // Robot.pp.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+                    double turretAngle = Robot.a == Alliance.RED ? -135 : 135;
+                    Turret.setAngle(turretAngle);
+                    Robot.odo.setHeading(90, AngleUnit.DEGREES);
+                });
+
+        gp.getButton(BetterGamepad.Buttons.SQUARE).whenPressed(()->Shooter.m.setVelocity(-1400));
+        gp.getButton(BetterGamepad.Buttons.TRIANGLE).whenPressed(()->Shooter.m.setVelocity(0));
+
 
     }
 
@@ -42,22 +62,22 @@ public class TeleOpLogic {
 
     public synchronized void updateLogic() {
 
-        if (gp1.crossWasPressed())
-            Intake.toggle();
+//        if (gp1.crossWasPressed())
+//            Intake.toggle();
 
-        if (gp1.circleWasPressed())
-            s.addTask(new ShootForta2());
+//        if (gp1.circleWasPressed())
+//            s.addTask(new ShootForta2());
 
         if (gp1.dpadLeftWasPressed())
             Spindexer.turnManuallyToLeft();
         if (gp1.dpadRightWasPressed())
             Spindexer.turnManuallyToRight();
 
-        startearly();
-        setPinpoint();
+//        startearly();
+//        setPinpoint();
 
 
-        s.update();
+      //  s.update();
     }
 
 
@@ -73,7 +93,8 @@ public class TeleOpLogic {
                 try {
 
                     drive.update();
-                    updateLogic();
+                    //updateLogic();
+                    gp.update();
                     Turret.update();
                     Shooter.update();
                     Spindexer.update();
@@ -95,17 +116,7 @@ public class TeleOpLogic {
         if (gp1.touchpadWasPressed()) {
 
             //Robot.pp.setOffsets(Robot.xOffset, Robot.yOffset, DistanceUnit.INCH);
-            if (Robot.a == Alliance.BLUE) {  //Robot.pp.resetPosAndIMU();
-                Robot.odo.setPosX(-12.44 / 2, DistanceUnit.INCH);
-                Robot.odo.setPosY(16.93 / 2, DistanceUnit.INCH);
-            } else {
-                Robot.odo.setPosX(12.44 / 2, DistanceUnit.INCH);
-                Robot.odo.setPosY(16.93 / 2, DistanceUnit.INCH);
-            }
-            // Robot.pp.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-            double turretAngle = Robot.a == Alliance.RED ? -135 : 135;
-            Turret.setAngle(turretAngle);
-            Robot.odo.setHeading(90, AngleUnit.DEGREES);
+
         }
     }
 
@@ -122,8 +133,8 @@ public class TeleOpLogic {
     }
     public synchronized void startearly(){
         if(gp1.squareWasPressed()){
-            Shooter.velocitystop =false;
-            Shooter.setRPM(Shooter.testingrpm);
+//            Shooter.velocitystop =false;
+//            Shooter.setRPM(Shooter.testingrpm);
         }
     }
     public void read(){
