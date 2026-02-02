@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 
 @TeleOp
 @Configurable
+
 public class BetterSwerveOpMode extends LinearOpMode {
     Robot robot;
 
     public static double p,d,ss,f;
-
     TeleOpLogic logic;
     long last;
 
@@ -34,6 +34,7 @@ public class BetterSwerveOpMode extends LinearOpMode {
     ServoController c;
     @Override
     public void runOpMode() throws InterruptedException {
+
         robot= new Robot(hardwareMap, telemetry ,Alliance.BLUE);
         robot.initialize();
         logic= new TeleOpLogic(robot, gamepad1, gamepad2);
@@ -43,6 +44,7 @@ public class BetterSwerveOpMode extends LinearOpMode {
 
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         waitForStart();
+
 
 
 

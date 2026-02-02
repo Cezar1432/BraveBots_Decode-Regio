@@ -24,13 +24,15 @@ public class TeleOpLogic {
 
     public TeleOpLogic(Robot robot, Gamepad gp1, Gamepad gp2) {
         this.robot = robot;
-        drive = new SwerveDrivetrain(robot);
-        drive.setWheelBase(26.8);
-        drive.setTrackWidth(34.4);
-        drive.setCoefs(new PDSFCoefficients(3, 0.5, 0, 0));
         this.gp1 = gp1;
         this.gp2 = gp2;
-        drive.setSuppliers(() -> this.gp1.left_stick_x, () -> this.gp1.left_stick_y, () -> this.gp1.right_stick_x);
+        drive = new SwerveDrivetrain(robot)
+                .setWheelBase(26.7)
+                .setTrackWidth(34.4)
+                .setCoefs(new PDSFCoefficients(3, 0.5, 0, 0))
+                .setSuppliers(() -> this.gp1.left_stick_x, () -> this.gp1.left_stick_y, () -> this.gp1.right_stick_x);
+
+
         s = new Scheduler();
 
     }
@@ -70,6 +72,11 @@ public class TeleOpLogic {
             while (logicRunning && !Thread.interrupted()) {
                 try {
 
+                    drive.update();
+                    updateLogic();
+                    Turret.update();
+                    Shooter.update();
+                    Spindexer.update();
                     robot.update();
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -109,11 +116,7 @@ public class TeleOpLogic {
     public void write(){
         drive.write();
         Turret.write();
-        drive.update();
-        updateLogic();
-        Turret.update();
-        Shooter.update();
-        Spindexer.update();
+
         logicHz= 1e9/(System.nanoTime()- lastLogicTime);
         lastLogicTime= System.nanoTime();
     }

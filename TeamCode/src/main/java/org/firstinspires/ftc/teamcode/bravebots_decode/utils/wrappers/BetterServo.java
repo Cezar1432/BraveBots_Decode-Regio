@@ -44,8 +44,9 @@ public class BetterServo extends ServoImpl implements Servo, HardwareDevice {
     }
 
 
-    public void setMaxDegrees(double maxDegrees){
+    public BetterServo setMaxDegrees(double maxDegrees){
         this.maxDegrees= maxDegrees;
+        return this;
     }
     public double getMaxAngle(){
         return maxDegrees;

@@ -17,7 +17,7 @@ public class TuningSpinner extends LinearOpMode {
         r.initialize();
         waitForStart();
         while (opModeIsActive()){
-            Spindexer.s1.setPosition(Spindexer.s1.getPosition()+ 0.00025 * gamepad1.right_stick_x);
+            Spindexer.setPosition(Spindexer.s1.getPosition()+ 0.0025 * gamepad1.left_stick_x);
             telemetry.addLine("Din joystick stanga gp1 ");
             telemetry.addData("pos", Spindexer.s1.getPosition());
             telemetry.update();

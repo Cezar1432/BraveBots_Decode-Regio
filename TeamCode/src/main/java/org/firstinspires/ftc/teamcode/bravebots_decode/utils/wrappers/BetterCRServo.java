@@ -20,10 +20,13 @@ public class BetterCRServo extends CRServoImpl implements CRServo, HardwareDevic
     ServoEncoder encoder;
     public BetterCRServo(ServoController pdsfController, int portNumber) {
         super(pdsfController, portNumber);
+        cachingTolerance= 0;
     }
 
     public BetterCRServo(ServoController pdsfController, int portNumber, Direction direction) {
         super(pdsfController, portNumber, direction);
+        cachingTolerance= 0;
+
     }
 
     public enum Controller{
@@ -55,13 +58,12 @@ public class BetterCRServo extends CRServoImpl implements CRServo, HardwareDevic
     double lastSetPower= 69;
     @Override
     public void setPower(double power){
-        double roundedPower = ((int)(power * 100)) / 100.0;
-        if(roundedPower != lastSetPower){
-            lastSetPower = roundedPower;
-            int m = 1;
-            if(direction == Direction.REVERSE) m = -1;
+        if(Math.abs(power- lastSetPower)> cachingTolerance) {
             super.setPower(power);
+            lastSetPower = power;
         }
+
+
 
     }
 
@@ -154,7 +156,13 @@ public class BetterCRServo extends CRServoImpl implements CRServo, HardwareDevic
         return targetPos;
     }
 
+    double cachingTolerance= 0;
 
+    public BetterCRServo setCachingTolerance(double tolerance){
+
+        this.cachingTolerance= tolerance;
+        return this;
+    }
 
 
 

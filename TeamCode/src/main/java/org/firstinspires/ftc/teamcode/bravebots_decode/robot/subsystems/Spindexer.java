@@ -11,15 +11,19 @@ public class Spindexer{
 
      public static BetterServo s1, s2;
 
+     public static void setPosition(double pos){
+         s1.setPosition(pos);
+         s2.setPosition(1- pos);
+     }
      public static void shootRandom(){
 //         s1.setMaxDegrees(1100);
 //         s2.setMaxDegrees(1100);
-         s1.setPosition(1);
+        setPosition(1);
           //  s2.setPosition(s31.getPosition());
      }
 
      public enum Slots{
-         SLOT_1(0.48,0), SLOT_2(.344,0), SLOT_3(.215,0);
+         SLOT_1(0.5322,0), SLOT_2(.4177,0), SLOT_3(.2878,0);
 
          final double frontPose, shootPose;
         // final double shootPose;
@@ -35,13 +39,13 @@ public class Spindexer{
 
      public static void turnTo(Slots slot){
          s1.setPosition(slot.frontPose);
+         currentSlot= slot;
      }
      public static void shootSlot(Slots slot){
          s1.setPosition(slot.shootPose);
      }
      public static void turnBack(){
          turnTo(Slots.SLOT_1);
-         currentSlot= Slots.SLOT_1;
      }
 
      public static double minimumTime= 800;
@@ -50,9 +54,11 @@ public class Spindexer{
 
      public static void turnManuallyToRight(){
          s1.turn(120);
+         s2.turn(-120);
      }
      public static void turnManuallyToLeft(){
          s1.turn(-120);
+         s2.turn(120);
      }
 
      public static boolean sorting= false;

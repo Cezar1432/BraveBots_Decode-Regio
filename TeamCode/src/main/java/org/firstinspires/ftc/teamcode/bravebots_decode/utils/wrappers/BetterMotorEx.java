@@ -47,6 +47,11 @@ public class BetterMotorEx extends DcMotorImplEx implements DcMotorEx, HardwareD
         time= new ElapsedTime();//aaa
 
     }
+    double cachingTolerance= 0;
+    public BetterMotorEx setCachingTolerance(double tolerance){
+        this.cachingTolerance= tolerance;
+        return this;
+    }
     public BetterMotorEx(DcMotorControllerEx controllerEx, int portNumber){
         super(controllerEx, portNumber);
         time= new ElapsedTime();

@@ -44,10 +44,11 @@ public class MecanumDrivetrain implements DrivetrainInterface {
 
     DoubleSupplier leftX, leftY, rightX;
     @Override
-    public void setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX) {
+    public MecanumDrivetrain setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX) {
         this.leftX= leftX;
         this.leftY= leftY;
         this.rightX= rightX;
+        return this;
     }
 
     @Override
@@ -103,18 +104,18 @@ public class MecanumDrivetrain implements DrivetrainInterface {
     }
 
 
-    public void setCoefs(PDSFCoefficients c) {
-
+    public MecanumDrivetrain setCoefs(PDSFCoefficients c) {
+        return this;
     }
 
     @Override
-    public void setTrackWidth(double trackWith) {
-
+    public MecanumDrivetrain setTrackWidth(double trackWith) {
+        return this;
     }
 
     @Override
-    public void setWheelBase(double wheelBase) {
-
+    public MecanumDrivetrain setWheelBase(double wheelBase) {
+            return this;
     }
 
 

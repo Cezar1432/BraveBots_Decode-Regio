@@ -6,11 +6,11 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficien
 import java.util.function.DoubleSupplier;
 
 public interface DrivetrainInterface {
-    void setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX);
+    DrivetrainInterface setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX);
     void update();
     void updateAuto(double s, double f, double r);
-    void setCoefs(PDSFCoefficients c);
-    void setTrackWidth(double trackWith);
-    void setWheelBase(double wheelBase);
+    DrivetrainInterface setCoefs(PDSFCoefficients c);
+    DrivetrainInterface setTrackWidth(double trackWith);
+    DrivetrainInterface setWheelBase(double wheelBase);
    // boolean ok= false;
 }

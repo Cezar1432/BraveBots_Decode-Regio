@@ -93,11 +93,11 @@ public class Robot {
     }
     public void initializeMotors(){
 
-        leftBack= new BetterMotor(expansionHubMotors, 1);
-        leftFront= new BetterMotor(expansionHubMotors, 0);
-        rightFront= new BetterMotor(controlHubMotors, 0);
-        rightBack= new BetterMotor(controlHubMotors, 1);
-        turret= new BetterMotor(controlHubMotors, 2);
+        leftBack= new BetterMotor(expansionHubMotors, 1).setCachingTolerance(.02);
+        leftFront= new BetterMotor(expansionHubMotors, 0).setCachingTolerance(.02);
+        rightFront= new BetterMotor(controlHubMotors, 0).setCachingTolerance(.02);
+        rightBack= new BetterMotor(controlHubMotors, 1).setCachingTolerance(.02);
+        turret= new BetterMotor(controlHubMotors, 2).setCachingTolerance(.02);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake= new BetterMotorEx(expansionHubMotors, 2);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -111,6 +111,7 @@ public class Robot {
         Shooter.m= shooter;
         Shooter.s= hood;
         Spindexer.s1= indexer1;
+        Spindexer.s2= indexer2;
         Spindexer.colorSensor= colorSensor;
         Turret.m= turret;
         LimelightMath.ll = ll;
@@ -119,12 +120,12 @@ public class Robot {
 
     public void initializeServos(){
 
-        fl= new BetterCRServo(expansionHubServos, 0, expansionHubAnalogInputController, 1);
-        bl= new BetterCRServo(expansionHubServos, 1,  expansionHubAnalogInputController, 0);
-        fr= new BetterCRServo(controlHubServos, 0, controlHubAnalogInputController, 1);
-        br= new BetterCRServo(controlHubServos, 1, controlHubAnalogInputController, 0);
-        indexer1= new BetterServo(controlHubServos, 2);
-        indexer1.setMaxDegrees(1065);
+        fl= new BetterCRServo(expansionHubServos, 0, expansionHubAnalogInputController, 1).setCachingTolerance(.02);
+        bl= new BetterCRServo(expansionHubServos, 1,  expansionHubAnalogInputController, 0).setCachingTolerance(.02);
+        fr= new BetterCRServo(controlHubServos, 0, controlHubAnalogInputController, 1).setCachingTolerance(.02);
+        br= new BetterCRServo(controlHubServos, 1, controlHubAnalogInputController, 0).setCachingTolerance(.02);
+        indexer1= new BetterServo(controlHubServos, 2).setMaxDegrees(1065);
+        indexer2= new BetterServo(expansionHubServos, 3).setMaxDegrees(1065);
         hood= new EvenBetterServo(expansionHubServos, 2);
 
     }

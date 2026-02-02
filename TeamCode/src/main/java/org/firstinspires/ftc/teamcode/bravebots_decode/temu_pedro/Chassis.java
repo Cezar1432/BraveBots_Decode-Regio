@@ -411,7 +411,6 @@ public class Chassis implements Runnable{
 
                 targetHeading = PinpointV1.normalizeHeading(targetHeading);
 
-                ///drive(-yRotated, xRotated, theta);
                 drivetrain.updateAuto(yRotated * maxPower, xRotated * maxPower, -theta * maxPower);
 
             }

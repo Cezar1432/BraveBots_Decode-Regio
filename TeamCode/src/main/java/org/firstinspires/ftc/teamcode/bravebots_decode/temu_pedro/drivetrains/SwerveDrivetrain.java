@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficien
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.slew_rate_limiter.GamepadLimiter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
+import org.opencv.core.Mat;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -31,6 +32,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     public SwerveModule fl, fr, bl, br;
 
     Robot robot;
+    boolean headingLock;
+    double headingCorrection;
     public SwerveDrivetrain(Robot robot) {
 
         this.robot= robot;
@@ -39,6 +42,10 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         br = new SwerveModule(mBR, sBR);
         fl = new SwerveModule(mFL, sFL);
         bl = new SwerveModule(mBL, sBL);
+        headingLock= false;
+        headingCorrection= 0;
+        headingController= new PIDFController(0.01 , Constants.strafe.getI(), 0.001, Constants.strafe.getF());
+
     }
 
 
@@ -77,11 +84,13 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
     public double radius= hypot(wheelBase, trackWidth);
-    public void setWheelBase(double wheelBase){
+    public SwerveDrivetrain setWheelBase(double wheelBase){
         this.wheelBase= wheelBase;
+        return this;
     }
-    public void setTrackWidth(double trackWidth){
+    public SwerveDrivetrain setTrackWidth(double trackWidth){
         this.trackWidth= trackWidth;
+        return this;
     }
 
     public class ModuleFinalOutput{
@@ -118,10 +127,9 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
             // Calculate shortest path
             double diff = angle - currentAngle;
-//            while (diff > 180) diff -= 360;
-//            while (diff < -180) diff += 360;
+            while (diff > 180) diff -= 360;
+            while (diff < -180) diff += 360;
 
-            diff%= 360;
 
             if (Math.abs(diff) > 90) {
                 diff = diff > 0 ? diff - 180 : diff + 180;
@@ -289,11 +297,12 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     }
     volatile public DoubleSupplier leftX, leftY, rightX;
     volatile GamepadLimiter limiter;
-    public void setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX){
+    public SwerveDrivetrain setSuppliers(DoubleSupplier leftX, DoubleSupplier leftY, DoubleSupplier rightX){
         this.leftX= leftX;
         this.leftY= leftY;
         this.rightX= rightX;
         limiter= new GamepadLimiter(leftX, leftY, rightX, 6);
+        return this;
     }
 
     public volatile double hz;
@@ -301,9 +310,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
 
-        if(headingController== null){
-            headingController= new PIDFController(0.012 , Constants.strafe.getI(), 0.0015, Constants.strafe.getF());
-        }
+
         if(trackWidth== 0)
             throw new IllegalArgumentException("Track Width nesetat");
         if(wheelBase== 0)
@@ -313,24 +320,24 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         double strafeY= limiter.getLeftY();
         if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
             radius= hypot(wheelBase, trackWidth);
-            //double heading= robot.odo.getHeading(AngleUnit.DEGREES);
+            if(Math.abs(rotation)< .2 && !headingLock){
+                headingLock= true;
+                lastAngle = robot.robotHeading;
+            }
+            else if(Math.abs(rotation)> .2){
+                headingLock= false;
+            }
 
-            //strafeY *= -1;
-            // strafeX*=-1;
-            if(Math.abs(rotation)>.1){
-                rotation*= -1.15;
-                lastAngle= robot.robotHeading;
-                joystickRot= true;
+            if(headingLock){
+                double err= MathStuff.normalizeDegrees(robot.robotHeading- lastAngle);
+                headingCorrection= headingController.calculate(0, err);
             }
-            else{
-                double diff= MathStuff.normalizeDegrees(robot.robotHeading- lastAngle);
-                rotation= -headingController.calculate(0, diff);
-                if(Math.abs(rotation)< .1)
-                    rotation= 0;
-            }
-            rot= rotation;
-//            if(joystickRot)
-//                strafeY*=.6;
+
+            rotation= headingLock ? -headingCorrection : -rotation;
+
+            if(Math.abs(rotation)< .135)
+                rotation= 0;
+
             double a = strafeX + rotation * (wheelBase / radius),
                     b = strafeX - rotation * (wheelBase / radius),
                     c = strafeY + rotation * (trackWidth / radius),
@@ -354,9 +361,9 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                 brSpeed /= max;
             }
 
-            fl.setState(flSpeed, toDegrees(flAngle));
+            fl.setState(-flSpeed, toDegrees(flAngle));
             fr.setState(frSpeed, toDegrees(frAngle));
-            bl.setState(brSpeed, toDegrees(blAngle));
+            bl.setState(-brSpeed, toDegrees(blAngle));
             br.setState(blSpeed, toDegrees(brAngle));
 
             lastFLangle = flAngle;
@@ -488,11 +495,12 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     @Override
 
 
-    public void setCoefs(PDSFCoefficients c){
+    public SwerveDrivetrain setCoefs(PDSFCoefficients c){
         fl.setCoefs(c);
         fr.setCoefs(c);
         bl.setCoefs(c);
         br.setCoefs(c);
+        return this;
     }
 
 

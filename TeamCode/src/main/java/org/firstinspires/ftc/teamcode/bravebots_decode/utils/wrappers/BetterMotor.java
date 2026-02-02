@@ -36,19 +36,26 @@ public class BetterMotor extends DcMotorImplEx implements DcMotorEx, HardwareDev
     private double lastSetPower = 69;
     private static double MAX_VELOCITY;
     private Direction direction;
+
+    double cachingTolerance;
     public BetterMotor(DcMotorController controller, int portNumber) {
 
         super(controller, portNumber);
+        cachingTolerance= 0;
     }
     public BetterMotor(DcMotorController controller, int portNumber, DcMotorSimple.Direction direction, ZeroPowerBehavior zeroPowerBehavior){
         super(controller, portNumber, direction);
         this.direction = direction;
         this.setZeroPowerBehavior(zeroPowerBehavior);
+        cachingTolerance= 0;
+
     }
     public BetterMotor(DcMotorController controller, int portNumber, DcMotorSimple.Direction direction){
         super(controller, portNumber, direction);
         this.direction = direction;
         this.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+        cachingTolerance= 0;
+
     }
     public BetterMotor(DcMotorController controller, int portNumber, DcMotorSimple.Direction direction, @NonNull MotorConfigurationType mct){
         super(controller, portNumber, direction, Objects.requireNonNull(mct));
@@ -56,11 +63,15 @@ public class BetterMotor extends DcMotorImplEx implements DcMotorEx, HardwareDev
 
         mct.setAchieveableMaxRPMFraction(1.0);
         this.controller.setMotorType(portNumber, mct.clone());
+        cachingTolerance= 0;
+
     }
     public BetterMotor(DcMotor motor){
         super(motor.getController(), motor.getPortNumber(), motor.getDirection(), motor.getMotorType());
         motor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         lastSetPower = 69;
+        cachingTolerance= 0;
+
     }
     /**
      * MaxVelocity is measured in [outputDiameter]_(SI) / s, we recommend using m/s
@@ -76,15 +87,17 @@ public class BetterMotor extends DcMotorImplEx implements DcMotorEx, HardwareDev
     }
     @Override
     public void setPower(double power){
-        if(power != lastSetPower){
-            power = ((int)(power * 100)) / 100.f;
-            lastSetPower = power;
-            int m = 1;
-            if(direction == Direction.REVERSE) m = -1;
-            controller.setMotorPower(this.getPortNumber(), power * m);
+        if(Math.abs(power- lastSetPower)> cachingTolerance) {
+            super.setPower(power);
+            lastSetPower= power;
         }
     }
 
+    public BetterMotor setCachingTolerance(double tolerance){
+        this.cachingTolerance= tolerance;
+
+        return this;
+    }
     public void setAproxVelocity(double velocity){
         setPower(velocity / MAX_VELOCITY);
     }
