@@ -15,6 +15,7 @@ public interface Localizer {
     double getPredictedY();
     Pose getActualPose();
     void resetLocalizer();
+    Pose getPredictedPose();
     static double normalizeHeading(double h){
         while(h> Math.PI) h-= 2* Math.PI;
         while(h< -Math.PI) h+= 2* Math.PI;

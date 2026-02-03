@@ -51,8 +51,8 @@ public class TeleOpLogic {
                     Robot.odo.setHeading(90, AngleUnit.DEGREES);
                 });
 
-        gp.getButton(BetterGamepad.Buttons.SQUARE).whenPressed(()->Shooter.m.setVelocity(-1400));
-        gp.getButton(BetterGamepad.Buttons.TRIANGLE).whenPressed(()->Shooter.m.setVelocity(0));
+        gp.getButton(BetterGamepad.Buttons.SQUARE).whenPressed(()->Shooter.motor1.setVelocity(-1400));
+        gp.getButton(BetterGamepad.Buttons.TRIANGLE).whenPressed(()->Shooter.motor1.setVelocity(0));
 
 
     }

@@ -35,7 +35,7 @@ public class TranslationTuning extends LinearOpMode {
         drive= new Chassis(robot, Chassis.Control.AUTO, gamepad1,Chassis.Localizers.PINPOINT_V2, Chassis.Drivetrain.SWERVE);
         drive.drivetrain.setCoefs(new PDSFCoefficients(3,0.5,0,0));
         swerveDrivetrain= new SwerveDrivetrain(robot);
-        drive.localizer.setOffsets(11.1, -5, DistanceUnit.CM);
+        drive.localizer.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
         drive.localizer.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         drive.setStartingPosition(new Pose());
         swerveDrivetrain.setCoefs(new PDSFCoefficients(3,0.5,0,0));

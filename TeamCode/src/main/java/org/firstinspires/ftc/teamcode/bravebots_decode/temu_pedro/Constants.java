@@ -20,12 +20,13 @@ public class Constants {
     public static PIDFController secondaryForward= new PIDFController(0.08,0,0.00001,0);
     public static PIDFController secondaryHeading= new PIDFController(2,0,0.15,0);
     public static double filterParameter = 0.8;
-    public static double xDeceleration = 1003716000, yDeceleration = 1003716000;
+    public static double xDeceleration = 80000* 25.4, yDeceleration = 80000 * 25.4;
     public volatile static long threadUpdatePeriod= 1;
     public static double headingConstraint= 0.05;
     public static volatile double distanceConstraint= 0.5;
     public static double XYVelocityConstraint= 1;
     public static double headingVelocityConstraint= 0.1;
+    public static double xOffset= 16, yOffset= -5.35;
 
 
 

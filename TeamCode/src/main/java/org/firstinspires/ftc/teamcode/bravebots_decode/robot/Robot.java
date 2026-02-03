@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
@@ -23,6 +22,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterColorSensor;
@@ -31,11 +31,8 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMoto
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetterServo;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
 
 import java.util.List;
-
-import javax.microedition.khronos.egl.EGL;
 
 public class Robot {
 
@@ -45,7 +42,7 @@ public class Robot {
     DcMotorControllerEx exExpansionHubMotors;
     public volatile BetterMotor leftFront, rightFront, leftBack, rightBack, turret;
     public BetterMotorEx intake;
-    public DcMotorEx shooter;
+    public DcMotorEx shooter, shooter2;
     public DcMotorController controlHubMotors, expansionHubMotors;
     public ServoController controlHubServos, expansionHubServos;
     public volatile BetterCRServo fl, bl, fr, br;
@@ -99,16 +96,19 @@ public class Robot {
         rightBack= new BetterMotor(controlHubMotors, 1).setCachingTolerance(.02);
         turret= new BetterMotor(controlHubMotors, 2).setCachingTolerance(.02);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intake= new BetterMotorEx(expansionHubMotors, 2);
+        intake= new BetterMotorEx(controlHubMotors, 3);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter= hm.get(DcMotorEx.class, "shooter");
+        shooter2= hm.get(DcMotorEx.class, "shooter2");
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
     private void assignHardware(){
         Intake.motor= intake;
-        Shooter.m= shooter;
+        Shooter.motor1 = shooter;
+        Shooter.motor2= shooter2;
         Shooter.s= hood;
         Spindexer.s1= indexer1;
         Spindexer.s2= indexer2;
@@ -132,7 +132,7 @@ public class Robot {
 
     public void initializeRest(){
         odo= hm.get(GoBildaPinpointDriver.class, "nigg");
-        odo.setOffsets(11.1, -5, DistanceUnit.CM);
+        odo.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         colorSensor= hm.get(BetterColorSensor.class, "color sensor");

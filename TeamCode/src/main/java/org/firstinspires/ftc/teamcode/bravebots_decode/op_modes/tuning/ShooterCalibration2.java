@@ -1,6 +1,9 @@
-package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
+package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tuning;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -10,27 +13,56 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.SpinRandom;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
-@TeleOp(
-        name = "LinearOpModeEx Test"
-)
-public class TestOpMode extends BetterOpMode {
+@TeleOp
+@Configurable
+public class ShooterCalibration2 extends BetterOpMode {
+    public static double velocity;
+    public static double increment= 0, waitTime= 0, waitTime2= 0;
+    public static class ShootFortaTunabil implements Task {
+        private final Scheduler s;
+        public ShootFortaTunabil(double vel){
+            s= new Scheduler();
+
+            s.addTask(()-> {
+                        Shooter.motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(.8,0,0,14.5));
+                        Shooter.motor1.setVelocity(-vel);
+                        Intake.start();
+
+                    })
+                    .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(vel))< Shooter.velocityThreshold)
+                    .addTask(new SpinRandom())
+                    .waitSeconds(waitTime)
+                    .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+increment))
+                    .waitSeconds(waitTime2)
+                    .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+ increment))
+                    .waitSeconds(2)
+                    .addTask(()->Shooter.motor1.setVelocity(-1300));
+        }
+
+        @Override
+        public boolean Run() {
+            s.update();
+            return s.done();
+        }
+    }
     Robot robot;
-    public SwerveDrivetrain drive;
-    Thread thread;
+    SwerveDrivetrain drive;
     Thread thread2;
-    boolean logicRunning= false, logicRunning2= false;
-    boolean allianceSet= false;
-    volatile double hz, hz2;
-    volatile double now2, last2, now3, last3;
+    boolean logicRunning2= false;
     @Override
     public void initialize() {
         robot= new Robot(hardwareMap, telemetry, Alliance.BLUE);
         robot.initialize();
+        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP)
+                .whenPressed(new ShootFortaTunabil(velocity));
         drive= new SwerveDrivetrain(robot).setWheelBase(26.7)
                 .setTrackWidth(34.4)
                 .setCoefs(new PDSFCoefficients(3, 0.5, 0, 0))
@@ -57,9 +89,9 @@ public class TestOpMode extends BetterOpMode {
             while (logicRunning2 && !Thread.interrupted()) {
                 try {
 
-                    now3= System.nanoTime();
-                    hz2= 1e9/(now3- last3);
-                    last3= now3;
+//                    now3= System.nanoTime();
+//                    hz2= 1e9/(now3- last3);
+//                    last3= now3;
                     drive.update();
                     //updateLogic();
                     Turret.update();
@@ -77,7 +109,6 @@ public class TestOpMode extends BetterOpMode {
 
         telemetry.setMsTransmissionInterval(1000);
 
-
     }
 
     @Override
@@ -85,16 +116,15 @@ public class TestOpMode extends BetterOpMode {
 
     }
 
-    long now, last= 0;
     @Override
     public void activeLoop() {
 
-        now= System.nanoTime();
-        telemetry.addData("hz", 1e9/(now- last));
-        telemetry.addData("hz2", hz);
-        telemetry.addData("hz3", hz2);
+
+        Shooter.s.setPosition(Shooter.s.getPosition()+ 0.0025*
+                (gamepadEx1.getDouble(BetterGamepad.Trigger.RIGHT_TRIGGER)- gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_TRIGGER)));
+        telemetry.addData("pos", Shooter.s.getPosition());
         telemetry.update();
-        last= now;
+
         robot.update();
         drive.write();
         Turret.write();
@@ -102,16 +132,13 @@ public class TestOpMode extends BetterOpMode {
 
     @Override
     public void init_start() {
-        //logicRunning= true;
         logicRunning2= true;
         thread2.start();
         Turret.reset();
-        Spindexer.turnBack();
     }
 
     @Override
     public void end() {
-        logicRunning= false;
-        logicRunning2= false;
+
     }
 }

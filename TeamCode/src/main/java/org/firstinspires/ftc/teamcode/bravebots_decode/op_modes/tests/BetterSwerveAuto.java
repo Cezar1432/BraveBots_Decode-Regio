@@ -28,7 +28,7 @@ public class BetterSwerveAuto extends BetterOpMode {
         r= new Robot(hardwareMap, telemetry, Alliance.BLUE);
         r.initialize();
         drive= new Chassis(r, Chassis.Control.AUTO, Chassis.Localizers.PINPOINT_V1, Chassis.Drivetrain.SWERVE);
-        drive.localizer.setOffsets(11.1, -5, DistanceUnit.CM);
+        drive.localizer.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
         drive.localizer.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         drive.drivetrain.setCoefs(new PDSFCoefficients(3, .5,0,0))
                 .setWheelBase(34.4)

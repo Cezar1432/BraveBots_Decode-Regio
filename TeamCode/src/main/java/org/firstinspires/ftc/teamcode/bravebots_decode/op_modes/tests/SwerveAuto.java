@@ -30,19 +30,23 @@ public class SwerveAuto extends BetterOpMode {
         r= new Robot(hardwareMap, telemetry, Alliance.BLUE);
         r.initialize();
         drive= new Chassis(r, Chassis.Control.AUTO, Chassis.Localizers.PINPOINT_V1, Chassis.Drivetrain.SWERVE);
-        drive.localizer.setOffsets(11.1, -5, DistanceUnit.CM);
+        drive.localizer.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
         drive.localizer.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         drive.drivetrain.setCoefs(new PDSFCoefficients(3, .5,0,0))
                 .setWheelBase(34.4)
                 .setTrackWidth(26.7);
         gamepadEx1.getButton(BetterGamepad.Buttons.CROSS)
                 .whenPressed(()->drive.lineToLinear(new Pose(24, -48, Math.toRadians(targetHeading))));
+
         gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP)
                 .whenPressed(()->targetHeading++);
+
         gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN)
                 .whenPressed(()->targetHeading--);
+
         gamepadEx1.getButton(BetterGamepad.Buttons.CIRCLE)
                 .whenPressed(()->drive.lineToConstant(new Pose(24, -48, Math.toRadians(targetHeading))));
+
         gamepadEx1.getButton(BetterGamepad.Buttons.TRIANGLE)
                 .whenPressed(()->drive.lineToTangential(new Pose(24, -48, Math.toRadians(targetHeading))));
 
@@ -54,7 +58,7 @@ public class SwerveAuto extends BetterOpMode {
     }
 
     String getPoseAsString(Pose p){
-        return "x: " + p.getX() + "y: " + p.getY() + "heading:" + p.getTheta();
+        return "x: " + p.getX() + " y: " + p.getY() + " heading: " + p.getTheta();
     }
     long now, last;
     @Override
@@ -65,6 +69,7 @@ public class SwerveAuto extends BetterOpMode {
         Pose p= drive.currentPose;
         telemetry.addData("target pose", getPoseAsString(drive.targetPosition));
         telemetry.addData("current pose", getPoseAsString(p));
+        telemetry.addData("predicted pose", getPoseAsString(drive.localizer.getPredictedPose()));
         now= System.nanoTime();
         telemetry.addData("hz", 1e9/(now- last));
         telemetry.update();

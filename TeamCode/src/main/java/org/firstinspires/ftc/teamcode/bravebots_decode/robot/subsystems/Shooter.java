@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
@@ -19,14 +18,12 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.ShooterConstants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Vector;
-import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
-import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetterServo;
 
 @Configurable
 public class Shooter {
     public static double velocityThreshold;
-    public static DcMotorEx m;
+    public static DcMotorEx motor1, motor2;
     public static double p = 0.8, i, d, f = 14.5;
     public static EvenBetterServo s;
     public static boolean velocitystop = false;
@@ -66,13 +63,13 @@ public class Shooter {
     }
     public static void setCoefs(){
         shootercoeffs= new PIDFCoefficients(p,i,d,f);
-        m.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,shootercoeffs);
+        motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,shootercoeffs);
 
     }
 
     public static void stop() {
         velocitystop = true;
-        m.close();
+        motor1.close();
         //shooter1.setPower(0);
         //shooter2.setPower(0);
 
@@ -117,7 +114,7 @@ public class Shooter {
 
     public static void setVelocity(double res){
         velocitystop = false;
-        m.setVelocity(res);
+        motor1.setVelocity(res);
     }
 
 
@@ -144,13 +141,13 @@ public class Shooter {
         return MathStuff.clamp(Math.abs(ShooterConstants.HOOD_MIN_ANGLE-ShooterConstants.HOOD_MAX_POS)/(Math.abs(ShooterConstants.HOOD_MIN_ANGLE-ShooterConstants.HOOD_MAX_ANGLE))*(res-ShooterConstants.HOOD_MIN_ANGLE)+ShooterConstants.HOOD_MIN_POS, 0.0, 1.0 );
     }
     public static void setVelocityCalculated(){
-        m.setVelocity(transformForMotor(ballvelocity));
+        motor1.setVelocity(transformForMotor(ballvelocity));
         s.setPosition(getServoPosition(hoodangle));
     }
 
 
     public static double getPower() {
-        return m.getPower();
+        return motor1.getPower();
     }
 
 
@@ -260,14 +257,14 @@ public class Shooter {
     }
 
     public static void simpleSet(){
-        m.setPower(1);
+        motor1.setPower(1);
     }
 
     public static void setMT1(){
-       m.setPower(1);
+       motor1.setPower(1);
     }
     public static void setMT2(){
-        m.setPower(-1);
+        motor1.setPower(-1);
     }
     public static void setRPM(double rpm){
         Shooter.rpm = rpm;
@@ -275,7 +272,7 @@ public class Shooter {
 
 
     public static void startMotorsSimple(){
-        m.setPower(1);
+        motor1.setPower(1);
     }
     public static boolean RPM_Reached(){
         //return Math.abs(rpm-getRPM())<rpmThreshhold;
@@ -286,7 +283,7 @@ public class Shooter {
     }
 
     public static boolean readyToGo(){
-        return !m.isBusy() && s.finished();
+        return !motor1.isBusy() && s.finished();
     }
     public static void waitTheTurn(){
         if(LimelightMath.getShooterRPM() == MAX_RPM )
@@ -295,19 +292,24 @@ public class Shooter {
 
         }
     }
+    double minPos= .508, maxPos= .8;
 
 
 
 
     public static double targetvel1, targetvel2;
+
+
     public static void update(){
-        PIDFCoefficients shootercoeffs= new PIDFCoefficients(p,i,d,f);
+        //PIDFCoefficients shootercoeffs= new PIDFCoefficients(p,i,d,f);
         PIDFController shooterctrl=new PIDFController(p,i,d,f);
 
        // shooter2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,shootercoeffs);
 
-        Shooter.updateRobotMovementVector();
-        Shooter.calculateShooterVelocity(Robot.odo.getHeading(AngleUnit.RADIANS));
+       // Shooter.updateRobotMovementVector();
+        //Shooter.calculateShooterVelocity(Robot.odo.getHeading(AngleUnit.RADIANS));
+
+        motor2.setPower(motor1.getPower());
 
         shooterctrl.setPIDF(p,i,d,f);
 //        double power= rpm/MAX_RPM;

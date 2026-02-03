@@ -48,6 +48,11 @@ public class PinpointV2 implements Localizer{
     }
 
     @Override
+    public Pose getPredictedPose() {
+        return null;
+    }
+
+    @Override
     public void update() {
 
     }

@@ -21,21 +21,26 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.Sp
 @Configurable
 public class ShooterCalibration extends LinearOpMode {
     public static double velocity;
+    public static double increment= 0, waitTime= 0, waitTime2= 0;
     public class ShootFortaTunabil implements Task {
         private final Scheduler s;
         public ShootFortaTunabil(double vel){
             s= new Scheduler();
 
             s.addTask(()-> {
-                                Shooter.m.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(.8,0,0,14.5));
-                                Shooter.m.setVelocity(-vel);
+                                Shooter.motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(.8,0,0,14.5));
+                                Shooter.motor1.setVelocity(-vel);
                         Intake.start();
 
                             })
-                    .addTask(()->Math.abs(Math.abs(Shooter.m.getVelocity())- Math.abs(vel))< Shooter.velocityThreshold)
+                    .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(vel))< Shooter.velocityThreshold)
                     .addTask(new SpinRandom())
+                    .waitSeconds(waitTime)
+                    .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+increment))
+                    .waitSeconds(waitTime2)
+                    .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+ increment))
                     .waitSeconds(2)
-                    .addTask(()->Shooter.m.setVelocity(-600));
+                    .addTask(()->Shooter.motor1.setVelocity(-1300));
         }
 
         @Override
@@ -66,7 +71,7 @@ public class ShooterCalibration extends LinearOpMode {
             //logic.read();
             s.update();
             telemetry.addData("dist", Turret.dist);
-            telemetry.addData("actual velocity", Shooter.m.getVelocity());
+            telemetry.addData("actual velocity", Shooter.motor1.getVelocity());
             telemetry.addData("velocity", velocity);
             telemetry.addData("hood pos", Shooter.s.getPosition());
 

@@ -61,5 +61,15 @@ public class Pose {
     public static double[] cartesianToPolar(double x, double y) {
         return new double[] {Math.sqrt(x * x + y * y), MathStuff.normalizeRadians(Math.atan2(y, x))};
     }
+    public Pose mirrorOnYAxis(){
+       Pose p= getPose();
+       double x, heading;
+       x= 144- p.getX();
+       heading= Math.toDegrees(p.getTheta());
+       heading = heading<= 180 ? 180- heading : 540 - heading;
+       return new Pose(x, p.getY(), p.getTheta());
+    }
+
+
 }
 

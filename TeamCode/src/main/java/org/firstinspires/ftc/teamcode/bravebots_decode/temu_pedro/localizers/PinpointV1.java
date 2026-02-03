@@ -9,6 +9,9 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LowPassFilter;
@@ -28,6 +31,12 @@ public class PinpointV1 implements Localizer {
     public void resetLocalizer(){
         odo.resetPosAndIMU();
     }
+
+    @Override
+    public Pose getPredictedPose() {
+        return new Pose(getPredictedX(), getPredictedY());
+    }
+
     public void setOffsets(double xStrafe, double yForward, DistanceUnit unit){
         this.xStrafe= xStrafe;
         this.yForward= yForward;
@@ -75,7 +84,8 @@ public class PinpointV1 implements Localizer {
     Pose pose= new Pose();
     public void setStartingPose(Pose startPose){
 
-        this.startPose= startPose;
+        //this.startPose= startPose;
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, startPose.x, startPose.y, AngleUnit.RADIANS, startPose.getTheta()));
 
 
     }
@@ -128,17 +138,22 @@ public class PinpointV1 implements Localizer {
         return this.predictedY;
     }
     public Pose getActualPose(){
-        double odoX= odo.getPosX(DistanceUnit.INCH);
-        double odoY= odo.getPosY(DistanceUnit.INCH);
-        double odoH= odo.getHeading(AngleUnit.RADIANS);
-
-        double y= odoY* Math.cos(startPose.getTheta()) - odoX* Math.sin(startPose.getTheta());
-        double x= odoX* Math.cos(startPose.getTheta()) + odoY* Math.sin(startPose.getTheta());
-        double heading= startPose.getTheta()+ odoH;
-        heading= normalizeHeading(heading);
+//        double odoX= odo.getPosX(DistanceUnit.INCH);
+//        double odoY= odo.getPosY(DistanceUnit.INCH);
+//        double odoH= odo.getHeading(AngleUnit.RADIANS);
+//
+//        double y= odoY* Math.cos(startPose.getTheta()) - odoX* Math.sin(startPose.getTheta());
+//        double x= odoX* Math.cos(startPose.getTheta()) + odoY* Math.sin(startPose.getTheta());
+//        double heading= startPose.getTheta()+ odoH;
+//        heading= normalizeHeading(heading);
        // setTargetVector(y*Math.cos(-heading) - x*Math.sin(-heading) , y*Math.sin(-heading)+x*Math.cos(-heading) , rotation);
 
 
+
+        Pose2D p = odo.getPosition();
+        double x= p.getX(DistanceUnit.INCH);
+        double y= p.getY(DistanceUnit.INCH);
+        double heading= p.getHeading(AngleUnit.RADIANS);
 
 
         return new Pose(x, y, heading);
@@ -146,8 +161,8 @@ public class PinpointV1 implements Localizer {
     @Override
     public void update(){
         odo.update();
-        currentPosition= new Pose(getActualPose().getX()+ getActualPose().getX(), getActualPose().getY()+ startPose.getY(), getActualPose().getTheta());
-        Pose currentPose= new Pose(getCurrentPosition().x, getCurrentPosition().getY(), getCurrentPosition().getTheta());
+        //currentPosition= new Pose(getActualPose().getX()+ getActualPose().getX(), getActualPose().getY()+ startPose.getY(), getActualPose().getTheta());
+        Pose currentPose= getActualPose();
          x= currentPose.getX();
          y= currentPose.getY();
          heading= currentPose.getTheta();

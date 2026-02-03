@@ -20,7 +20,7 @@ public class ShootForta2 implements Task {
     public boolean Run() {
        // Shooter.setVelocityCalculated();
         Shooter.setVelocityCalculated();
-        Shooter.m.setVelocity(Shooter.transformForMotor(Shooter.ballvelocity));
+        Shooter.motor1.setVelocity(Shooter.transformForMotor(Shooter.ballvelocity));
         s.update();
         return s.done();
     }

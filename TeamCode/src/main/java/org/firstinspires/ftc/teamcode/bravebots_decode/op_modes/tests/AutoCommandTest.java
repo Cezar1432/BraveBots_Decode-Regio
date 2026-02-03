@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Chassis;
+import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
@@ -42,7 +43,7 @@ public class AutoCommandTest extends LinearOpMode {
         drive = new Chassis(robot, Chassis.Control.AUTO, gamepad1, Chassis.Localizers.PINPOINT_V2, Chassis.Drivetrain.SWERVE);
         drive.drivetrain.setCoefs(new PDSFCoefficients(3, 0.5, 0, 0));
         swerveDrivetrain = new SwerveDrivetrain(robot);
-        drive.localizer.setOffsets(11.1, -5, DistanceUnit.CM);
+        drive.localizer.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
         drive.localizer.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         drive.setStartingPosition(new Pose());
         swerveDrivetrain.setCoefs(new PDSFCoefficients(3, 0.5, 0, 0));

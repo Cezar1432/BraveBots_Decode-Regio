@@ -1,11 +1,19 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS;
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
+
+import android.view.inputmethod.InsertGesture;
+
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
@@ -13,53 +21,50 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Chassis;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.localizers.Localizer;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @TeleOp
-public class LocalizerTest extends LinearOpMode {
-    Robot robot;
-    Chassis drive;
-    // MultipleTelemetry t;
-    Telemetry t;
-    ElapsedTime time;
-    SwerveDrivetrain swerveDrivetrain;
-    Pose p= new Pose();
+@Configurable
+public class LocalizerTest extends BetterOpMode {
+
+    public static double xOffset= 11.6, yOffset= -5.35;
+
+    GoBildaPinpointDriver odo;
     @Override
-    public void runOpMode() throws InterruptedException {
-        t= this.telemetry;
-        robot= new Robot(hardwareMap, t, Alliance.BLUE);
+    public void initialize() {
+        odo= hardwareMap.get(GoBildaPinpointDriver.class, "nigg");
+        odo.setOffsets(xOffset, yOffset, CM);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-        robot.initialize();
-        drive= new Chassis(robot, Chassis.Control.AUTO, gamepad1,Chassis.Localizers.PINPOINT_V2, Chassis.Drivetrain.SWERVE);
-        drive.drivetrain.setCoefs(new PDSFCoefficients(3,0.5,0,0));
-        swerveDrivetrain= new SwerveDrivetrain(robot);
-        //drive.localizer.setOffsets(11.1, -5, DistanceUnit.CM);
-        //drive.localizer.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
-        drive.setStartingPosition(new Pose());
-        swerveDrivetrain.setCoefs(new PDSFCoefficients(3,0.5,0,0));
-        drive.drivetrain.setTrackWidth(34.4);
-        drive.drivetrain.setWheelBase(26.8);
-        waitForStart();
-        //drive.startChassisThread2();
-        time= new ElapsedTime();
-        while (opModeIsActive()){
+        gamepadEx1.getButton(BetterGamepad.Buttons.CROSS).whenPressed(()->odo.setOffsets(xOffset, yOffset, CM));
 
-            if(gamepad1.crossWasPressed())
-                drive.localizer.resetLocalizer();
+    }
 
-            t.addData("x", drive.getCurrentPosition().getX());
-            t.addData("y", drive.getCurrentPosition().getY());
-            t.addData("theta", drive.getCurrentPosition().getNormalizedTheta());
+    @Override
+    public void initializeLoop() {
 
+    }
 
-            t.update();
-            drive.update();
-            drive.setMaxPower(0);
-            robot.update();
+    @Override
+    public void activeLoop() {
 
-        }
-        drive.stopChassisThread();
+        odo.update();
+        telemetry.addData("x", odo.getPosX(INCH));
+        telemetry.addData("y", odo.getPosY(INCH));
+        telemetry.addData("heading", odo.getHeading(RADIANS));
+        telemetry.update();
+    }
+
+    @Override
+    public void init_start() {
+
+    }
+
+    @Override
+    public void end() {
 
     }
 }
