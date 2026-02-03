@@ -22,18 +22,15 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetter
 
 @Configurable
 public class Shooter {
-    public static double velocityThreshold;
+    public static double velocityThreshold= 50;
     public static DcMotorEx motor1, motor2;
-    public static double p = 0.8, i, d, f = 14.5;
+    public static double p = 20, i, d, f = 15;
     public static EvenBetterServo s;
     public static boolean velocitystop = false;
     public static double hoodincrement= 0.045,shootTime=0.12,coefNiggaMan=1.3,waitForNigga=3, hoodtunabil = 0;
     public static double  MAX_RPM = 5800;
     public static double up_pos = 0.2231;
     public static final double g= 9.81;
-
-
-
     public static double hoodangle = 0;
     public static double rpm, pos, testingrpm, ballvelocity = 0;
     public static Vector robotmovementvector=new Vector(0,0);
@@ -63,10 +60,19 @@ public class Shooter {
     }
     public static void setCoefs(){
         shootercoeffs= new PIDFCoefficients(p,i,d,f);
-        motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,shootercoeffs);
-
+        motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(p,i,d,f));
+        motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(p,i,d,f));
     }
-
+    public static boolean wereCoeffsSet = false;
+    public static void setVelocity(double vel){
+        if(!wereCoeffsSet)
+        {
+            wereCoeffsSet = true;
+            setCoefs();
+        }
+        motor1.setVelocity(-vel);
+        motor2.setVelocity(-vel);
+    }
     public static void stop() {
         velocitystop = true;
         motor1.close();
@@ -112,10 +118,6 @@ public class Shooter {
         return Range.clip(t, 0.0, 1.0);
     }
 
-    public static void setVelocity(double res){
-        velocitystop = false;
-        motor1.setVelocity(res);
-    }
 
 
 
@@ -156,7 +158,11 @@ public class Shooter {
         return 0;
     }
 
-
+    public static void changePIDF(double p, double i, double d, double f)
+    {
+        motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(p,i,d,f));
+        motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(p,i,d,f));
+    }
     public static void setHood2() {
         s.setPosition(hoodtunabil);
     }
@@ -301,31 +307,7 @@ public class Shooter {
 
 
     public static void update(){
-        //PIDFCoefficients shootercoeffs= new PIDFCoefficients(p,i,d,f);
-        PIDFController shooterctrl=new PIDFController(p,i,d,f);
 
-       // shooter2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,shootercoeffs);
-
-       // Shooter.updateRobotMovementVector();
-        //Shooter.calculateShooterVelocity(Robot.odo.getHeading(AngleUnit.RADIANS));
-
-        motor2.setPower(motor1.getPower());
-
-        shooterctrl.setPIDF(p,i,d,f);
-//        double power= rpm/MAX_RPM;
-//        double voltage= Robot.voltageSensor.getVoltage();
-//        if(voltage< 12.0)
-//            power= (12.0/ voltage);
-//
-//        double launchpower=Math.abs(shooterctrl.calculate(rpm));
-        if(!velocitystop) {
-            // shooter1.setPower(power);
-            //shooter2.setPower(power);
-//            shooter1.setVelocity(ballvelocity);
-//            shooter2.setVelocity(ballvelocity);
-        }
-//      shooter1.update();
-//        shooter2.update();
     }
 
 

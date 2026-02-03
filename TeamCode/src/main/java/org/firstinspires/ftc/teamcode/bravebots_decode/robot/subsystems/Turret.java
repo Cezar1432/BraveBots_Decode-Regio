@@ -132,9 +132,13 @@ public class Turret {
     public static final double UPDATE_PERIOD= 700, PINPOINT_UPDATE_PERIOD = 2000;
     public static volatile boolean conditioneAllign= false;
     public static double position;
+    public static boolean tracking;
     public static Position positionll;
     public static Pose3D pose;
 
+    public static void setTracking(boolean tracking){
+        Turret.tracking= tracking;
+    }
 
     public static double normalize(double h){
         while (h> 180) h-=360;
@@ -250,55 +254,53 @@ public class Turret {
 
 /// /////////////////////////////
 
+        if(tracking) {
 
-        try {
-            LLResult res = LimelightMath.getResults();
-            if (res != null && res.isValid()) {
-               List<LLResultTypes.FiducialResult> fiducials = res.getFiducialResults();
-               for(LLResultTypes.FiducialResult fiduci : fiducials)
-               {
-                   int apriltagID = fiduci.getFiducialId();
-                   if((Robot.a == Alliance.RED && apriltagID == 24) || (Robot.a == Alliance.BLUE && apriltagID ==20))
-                   {
-                       allignedbylimelight = true;
-                       pose = res.getBotpose_MT2();
-                       positionll = pose.getPosition();
-                       if (positionll.x != 0 && positionll.y != 0) {
-                           Robot.odo.setPosX(positionll.y, DistanceUnit.METER);
-                           Robot.odo.setPosY(-positionll.x, DistanceUnit.METER);
-                       }
-                   }
-               }
+            try {
+                LLResult res = LimelightMath.getResults();
+                if (res != null && res.isValid()) {
+                    List<LLResultTypes.FiducialResult> fiducials = res.getFiducialResults();
+                    for (LLResultTypes.FiducialResult fiduci : fiducials) {
+                        int apriltagID = fiduci.getFiducialId();
+                        if ((Robot.a == Alliance.RED && apriltagID == 24) || (Robot.a == Alliance.BLUE && apriltagID == 20)) {
+                            allignedbylimelight = true;
+                            pose = res.getBotpose_MT2();
+                            positionll = pose.getPosition();
+                            if (positionll.x != 0 && positionll.y != 0) {
+                                Robot.odo.setPosX(positionll.y, DistanceUnit.METER);
+                                Robot.odo.setPosY(-positionll.x, DistanceUnit.METER);
+                            }
+                        }
+                    }
+                }
+            } catch (Throwable e) {
+                android.util.Log.e("Turrret", e.getMessage(), e);
             }
-        }
-        catch (Throwable e){
-            android.util.Log.e("Turrret", e.getMessage(), e);
-        }
 
-        if (Robot.odo.getPosX(DistanceUnit.METER) != 0 && Robot.odo.getPosY(DistanceUnit.METER) != 0) {
-            y = Robot.odo.getPosX(DistanceUnit.METER);
-            x = Robot.odo.getPosY(DistanceUnit.METER);
+            if (positionll!= null && positionll.x != 0 && positionll.y != 0) {
+                y =positionll.y;
+                x = positionll.x;
 
-            yCorner = Robot.a== Alliance.RED ? FIELD_LENGTH/2- y: FIELD_LENGTH/2+ y;
-            xCorner = FIELD_LENGTH/2 - x ;
+                yCorner = Robot.a == Alliance.RED ? FIELD_LENGTH / 2 - y : FIELD_LENGTH / 2 + y;
+                xCorner = FIELD_LENGTH / 2 - x;
 
-            dist= Math.hypot(xCorner, yCorner);
+                dist = Math.hypot(xCorner, yCorner);
 
-            fieldRelative = Math.atan(xCorner / yCorner);
-            fieldRelative = Math.toDegrees(fieldRelative);
-            if(Robot.a== Alliance.BLUE)
-                fieldRelative= 180- fieldRelative;
-            robotRelative= normalize(fieldRelative- Robot.odo.getHeading(AngleUnit.DEGREES));
-            turretRelative= normalize(robotRelative- 180);
+                fieldRelative = Math.atan(xCorner / yCorner);
+                fieldRelative = Math.toDegrees(fieldRelative);
+                if (Robot.a == Alliance.BLUE)
+                    fieldRelative = 180 - fieldRelative;
+                robotRelative = normalize(fieldRelative - Robot.odo.getHeading(AngleUnit.DEGREES));
+                turretRelative = normalize(robotRelative - 180);
 
-            robotRelative = Robot.a == Alliance.RED ? robotRelative : -robotRelative;
-            targetTicks= ticksPerDegree * turretRelative;
-            targetTicks= Range.clip(targetTicks, minTicks, maxTicks);
-            c.setPIDF(p, i, d, f);
+                robotRelative = Robot.a == Alliance.RED ? robotRelative : -robotRelative;
+                targetTicks = ticksPerDegree * turretRelative;
+                targetTicks = Range.clip(targetTicks, minTicks, maxTicks);
+                c.setPIDF(p, i, d, f);
 
 
-            // if (timer.milliseconds() > UPDATE_PERIOD && Math.abs(lastAngle - robotRelative) > angleThreshold) {
-            //setAngle(turretRelative);
+                // if (timer.milliseconds() > UPDATE_PERIOD && Math.abs(lastAngle - robotRelative) > angleThreshold) {
+                //setAngle(turretRelative);
 //            c.setPIDF(p,i,d,f);
 //            c2.setPIDF(p2,i2,d2,f2);
 //            sign=Math.signum(finalAngle-getAngle());
@@ -312,14 +314,22 @@ public class Turret {
 //                power*= (12.0/ voltage);
 //            s1.setPower(-power);
 //            s2.setPower(power);
+            }
         }
+
 
 
 
     }
     public static void write(){
-        power = c.calculate(m.getCurrentPosition(), targetTicks);
-        m.setPower(power);
+        if(tracking) {
+            power = c.calculate(m.getCurrentPosition(), targetTicks);
+            m.setPower(power);
+        }
+        else {
+            power= c.calculate(m.getCurrentPosition(), 0);
+            m.setPower(power);
+        }
     }
 //    public static double getAngle(){
 //        return (1-(s1.getTruePosition()- NEUTRAL_POSITION))* 360 * GEAR_RATIO - 180* GEAR_RATIO;

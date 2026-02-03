@@ -86,6 +86,7 @@ public class Spindexer{
                      else if(currentSlot== Slots.SLOT_2)
                          currentSlot= Slots.SLOT_3;
 
+
                      turnTo(currentSlot);
                  }
              }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tuning;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -17,38 +18,40 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.S
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.SpinRandom;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
-import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
-
-import java.util.function.DoubleSupplier;
-
 @TeleOp
 @Configurable
-public class ShooterCalibration2 extends BetterOpMode {
+public class ShooterCalibrationTeodor extends LinearOpMode {
+    Robot r;
+    SwerveDrivetrain drive;
+    Thread thread2;
+    Scheduler currentTask;
     public static double velocity;
     public static double increment= 0, waitTime= 0, waitTime2= 0;
     public static double p=0,d=0,i=0,f=0;
+    public BetterGamepad gamepadEx1, gamepadEx2;
+    boolean logicRunning2= false;
     public static class ShootFortaTunabil implements Task {
         private final Scheduler s;
         public ShootFortaTunabil(double vel){
             s= new Scheduler();
 
             s.addTask(()-> {
-                        nigg = true;
-                        Shooter.motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(p,i,d,f));
-                        Shooter.motor2.setVelocity(-vel);
+                        Shooter.setVelocity(velocity);
                         Intake.start();
-
-                    })
+            })
                     .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(vel))< Shooter.velocityThreshold)
-                    .addTask(new SpinRandom())
+                    .addTask(Spindexer::shootRandom)
                     .waitSeconds(waitTime)
                     .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+increment))
                     .waitSeconds(waitTime2)
                     .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+ increment))
-                    .waitSeconds(2)
-                    .addTask(()->Shooter.motor2.setVelocity(-1300));
+                    .waitSeconds(1)
+                    .addTask(Spindexer::turnBack)
+                    .addTask(()->{
+                        Shooter.setVelocity(1300);
+                    });
         }
 
         @Override
@@ -57,19 +60,18 @@ public class ShooterCalibration2 extends BetterOpMode {
             return s.done();
         }
     }
-    Robot robot;
-    SwerveDrivetrain drive;
-    Thread thread2;
-    boolean logicRunning2= false;
-    @Override
-    public void initialize() {
 
-        robot= new Robot(hardwareMap, telemetry, Alliance.BLUE);
-        robot.initialize();
+    double now, last=0;
+    @Override
+    public void runOpMode() throws InterruptedException {
+        r= new Robot(hardwareMap, telemetry, Alliance.BLUE);
+        r.initialize();
 //        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP)
 //                .whenPressed(()->
 //                        new ShootFortaTunabil(()->velocity));
-        drive= new SwerveDrivetrain(robot).setWheelBase(26.7)
+        gamepadEx1 = new BetterGamepad(gamepad1);
+        gamepadEx2 = new BetterGamepad(gamepad2);
+        drive= new SwerveDrivetrain(r).setWheelBase(26.7)
                 .setTrackWidth(34.4)
                 .setCoefs(new PDSFCoefficients(3, 0.5, 0, 0))
                 .setSuppliers(() -> gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_X), () -> gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_Y), () -> gamepadEx1.getDouble(BetterGamepad.Trigger.RIGHT_X));
@@ -87,17 +89,13 @@ public class ShooterCalibration2 extends BetterOpMode {
             Turret.setAngle(turretAngle);
             Robot.odo.setHeading(90, AngleUnit.DEGREES);
         });
-
+        currentTask = new Scheduler();
 //        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP).whenPressed(
 //                ()->{
 //                    nigg= true;
 //                    opModeScheduler.addTask(new ShootFortaTunabil(()->velocity));
 //                }
 //6        );
-        gamepadEx1.getButton(BetterGamepad.Buttons.SQUARE).whenPressed(()-> Shooter.motor1.setVelocity(-1400));
-        gamepadEx1.getButton(BetterGamepad.Buttons.TRIANGLE).whenPressed(()->Shooter.motor1.setVelocity(0));
-        //gamepadEx1.getButton(BetterGamepad.Buttons.CIRCLE).whenPressed(()->()-> Shooter.motor2.getCurrentPosition()< 100);
-
         thread2= new Thread(()->{
             while (logicRunning2 && !Thread.interrupted()) {
                 try {
@@ -122,49 +120,44 @@ public class ShooterCalibration2 extends BetterOpMode {
 
         telemetry.setMsTransmissionInterval(1000);
 
-    }
 
-    @Override
-    public void initializeLoop() {
-
-    }
-    public static boolean nigg= false;
-    @Override
-    public void activeLoop() {
-
-
-        if(gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN).wasPressed()){
-            opModeScheduler.addTask(new SpinRandom());
-            nigg= true;
-        }
-
-        if(gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP).wasPressed()) {
-            opModeScheduler.addTask(new ShootFortaTunabil(velocity));
-            //nigg= true;
-        }
-        Shooter.s.setPosition(Shooter.s.getPosition()+ 0.0025*
-                (gamepadEx1.getDouble(BetterGamepad.Trigger.RIGHT_TRIGGER)- gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_TRIGGER)));
-        telemetry.addData("pos", Shooter.s.getPosition());
-        telemetry.addData("vel", Shooter.motor1.getVelocity());
-        telemetry.addData("vel 2", Shooter.motor2.getVelocity());
-        telemetry.addData("nigg", nigg);
-        telemetry.update();
-
-        robot.update();
-        drive.write();
-        Turret.write();
-    }
-
-    @Override
-    public void init_start() {
-        logicRunning2= true;
-        thread2.start();
+        waitForStart();
         Turret.reset();
         Spindexer.turnBack();
-    }
+        logicRunning2 = true;
+        thread2.start();
+        Turret.setTracking(true);
+        while (opModeIsActive()){
+            if(gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN).wasPressed()){
+                Shooter.motor1.setVelocity(-velocity);
+                Shooter.motor2.setVelocity(-velocity);
+            }
+            if(gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP).wasPressed()) {
+                currentTask.addTask(new ShootFortaTunabil(velocity));
+                //nigg= true;
+            }
+            Shooter.s.setPosition(Shooter.s.getPosition()+ 0.0025*
+                    (gamepadEx1.getDouble(BetterGamepad.Trigger.RIGHT_TRIGGER)- gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_TRIGGER)));
+            now= System.nanoTime();
+            telemetry.addData("hz", 1e9/(now- last));
+            last= now;
+            telemetry.addData("pos", Shooter.s.getPosition());
+            telemetry.addData("vel", Shooter.motor1.getVelocity());
+            telemetry.addData("vel 2", Shooter.motor2.getVelocity());
+            telemetry.addData("encoderTurret",Turret.m.getCurrentPosition());
+            telemetry.addData("p", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).p);
+            telemetry.addData("d", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).d);
+            telemetry.addData("i", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).i);
+            telemetry.addData("f", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).f);
+            telemetry.addData("tracking", Turret.tracking);
+            telemetry.update();
+            gamepadEx1.update();
 
-    @Override
-    public void end() {
-        logicRunning2= false;
+            r.update();
+            currentTask.update();
+            drive.write();
+            Turret.write();
+        }
+        logicRunning2 = false;
     }
 }

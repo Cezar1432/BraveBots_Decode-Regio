@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -30,13 +31,14 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMoto
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetterServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.LazyPinpoint;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import java.util.List;
 
 public class Robot {
 
-    public static GoBildaPinpointDriver odo;
+    public static LazyPinpoint odo;
 
 
     DcMotorControllerEx exExpansionHubMotors;
@@ -109,6 +111,7 @@ public class Robot {
         Intake.motor= intake;
         Shooter.motor1 = shooter;
         Shooter.motor2= shooter2;
+        //Shooter.setCoefs();
         Shooter.s= hood;
         Spindexer.s1= indexer1;
         Spindexer.s2= indexer2;
@@ -131,7 +134,9 @@ public class Robot {
     }
 
     public void initializeRest(){
-        odo= hm.get(GoBildaPinpointDriver.class, "nigg");
+        //odo= hm.get(GoBildaPinpointDriver.class, "nigg");
+        odo= hm.get(LazyPinpoint.class, "nigg");
+        odo.setFreq(200);
         odo.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -175,11 +180,16 @@ public class Robot {
         //hubs.forEach(LynxModule::close);
 
 
-
         odo.update();
+
         robotHeading = odo.getHeading(AngleUnit.DEGREES);
-        updatedHeading = LimelightMath.getLimelightUpdateAngle();
-        ll.updateRobotOrientation(updatedHeading);
+
+        // odo.update();
+
+        if(Turret.tracking) {
+            updatedHeading = LimelightMath.getLimelightUpdateAngle();
+            ll.updateRobotOrientation(updatedHeading);
+        }
     }
 
 

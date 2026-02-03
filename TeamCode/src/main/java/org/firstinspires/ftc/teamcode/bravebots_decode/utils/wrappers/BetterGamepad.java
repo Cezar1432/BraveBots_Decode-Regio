@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.S
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class BetterGamepad {
     Gamepad gp;
@@ -32,7 +33,7 @@ public class BetterGamepad {
     public class Button{
         Buttons button;
         BooleanSupplier pressed;
-        Task t;
+        Supplier<Task> t;
         public Button(Buttons button){
             this.button= button;
 
@@ -80,10 +81,10 @@ public class BetterGamepad {
             }
         }
         public void whenPressed(Task t){
-            this.t= t;
+            this.t= ()-> t;
         }
         public void whenPressed(Scheduler.InstantTask t){
-            this.t= () -> {
+            this.t= ()->() -> {
                 t.run();
                 return true;
             };
@@ -112,8 +113,9 @@ public class BetterGamepad {
 
     public void update(){
         for(Button button: buttons){
-            if(button.wasPressed() && button.t!= null){
-                scheduler.addTask(button.t);
+            if(button.t!= null){
+                if(button.wasPressed())
+                    scheduler.addTask(button.t.get());
             }
         }
         scheduler.update();
