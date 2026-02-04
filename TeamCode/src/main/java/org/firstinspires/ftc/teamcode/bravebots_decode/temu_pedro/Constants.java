@@ -22,8 +22,8 @@ public class Constants {
     public static double filterParameter = 0.8;
     public static double xDeceleration = 80000* 25.4, yDeceleration = 80000 * 25.4;
     public volatile static long threadUpdatePeriod= 1;
-    public static double headingConstraint= 0.05;
-    public static volatile double distanceConstraint= 0.5;
+    public static double headingConstraint= 0.1;
+    public static volatile double distanceConstraint= 3;
     public static double XYVelocityConstraint= 1;
     public static double headingVelocityConstraint= 0.1;
     public static double xOffset= 16, yOffset= -5.35;

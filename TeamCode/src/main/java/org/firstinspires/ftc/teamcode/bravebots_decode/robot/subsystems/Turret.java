@@ -279,7 +279,7 @@ public class Turret {
 
             if (positionll!= null && positionll.x != 0 && positionll.y != 0) {
                 y =positionll.y;
-                x = positionll.x;
+                x = -positionll.x;
 
                 yCorner = Robot.a == Alliance.RED ? FIELD_LENGTH / 2 - y : FIELD_LENGTH / 2 + y;
                 xCorner = FIELD_LENGTH / 2 - x;
@@ -314,6 +314,9 @@ public class Turret {
 //                power*= (12.0/ voltage);
 //            s1.setPower(-power);
 //            s2.setPower(power);
+            }
+            else{
+                targetTicks= 0;
             }
         }
 

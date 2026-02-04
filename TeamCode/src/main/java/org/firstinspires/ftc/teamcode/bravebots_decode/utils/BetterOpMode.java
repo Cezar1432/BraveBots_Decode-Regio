@@ -10,6 +10,10 @@ public abstract class BetterOpMode extends LinearOpMode {
 
     public BetterGamepad gamepadEx1, gamepadEx2;
     public Scheduler opModeScheduler;
+    boolean schedulerUpdateInInit= false;
+    public void setSchedulerUpdateInInit(boolean set){
+        schedulerUpdateInInit= set;
+    }
     @Override
     public void runOpMode() throws InterruptedException {
         gamepadEx1= new BetterGamepad(gamepad1);
@@ -18,7 +22,8 @@ public abstract class BetterOpMode extends LinearOpMode {
         initialize();
         while (opModeInInit()){
             initializeLoop();
-            opModeScheduler.update();
+            if(schedulerUpdateInInit)
+                opModeScheduler.update();
         }
         waitForStart();
         init_start();

@@ -5,6 +5,8 @@ import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveDriveKinematics;
 
 import org.firstinspires.ftc.robotcore.external.Consumer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantAsync;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantAsyncAndConstraints;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantAsyncAndTime;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantSync;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToLinearAsync;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToLinearSync;
@@ -142,6 +144,18 @@ public class Scheduler {
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
         queue.addLast(new LineToConstantAsync(this.f, p));
+        return this;
+    }
+    public Scheduler lineToConstantAsync(Pose p, double time){
+        if(f== null)
+            throw new NullPointerException("baga Chassis in constructor");
+        queue.addLast(new LineToConstantAsyncAndTime(this.f, p, time));
+        return this;
+    }
+    public Scheduler lineToConstantAsync(Pose p, double dist, double rad){
+        if(f== null)
+            throw new NullPointerException("baga Chassis in constructor");
+        queue.addLast(new LineToConstantAsyncAndConstraints(this.f, p, dist, rad));
         return this;
     }
 

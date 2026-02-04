@@ -41,8 +41,8 @@ public class PinpointV1 implements Localizer {
         this.xStrafe= xStrafe;
         this.yForward= yForward;
         odo.setOffsets(this.xStrafe, this.yForward, unit);
-        odo.recalibrateIMU();
-        odo.resetPosAndIMU();
+//        odo.recalibrateIMU();
+//        odo.resetPosAndIMU();
 
 
     }
@@ -56,8 +56,8 @@ public class PinpointV1 implements Localizer {
 
     public void setEncoderDirections(GoBildaPinpointDriver.EncoderDirection xPodDirection, GoBildaPinpointDriver.EncoderDirection yPodDirection){
         odo.setEncoderDirections(xPodDirection, yPodDirection);
-        odo.recalibrateIMU();
-        odo.resetPosAndIMU();
+//        odo.recalibrateIMU();
+//        odo.resetPosAndIMU();
     }
 
     @Override

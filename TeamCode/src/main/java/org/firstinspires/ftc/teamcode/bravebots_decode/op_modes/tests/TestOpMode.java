@@ -49,6 +49,10 @@ public class TestOpMode extends BetterOpMode {
             Turret.setAngle(turretAngle);
             Robot.odo.setHeading(90, AngleUnit.DEGREES);
         });
+        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP)
+                        .whenPressed(()-> Turret.setTracking(true));
+        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN)
+                        .whenPressed(()-> Turret.setTracking(false));
 
         gamepadEx1.getButton(BetterGamepad.Buttons.SQUARE).whenPressed(()-> Shooter.motor1.setVelocity(-1400));
         gamepadEx1.getButton(BetterGamepad.Buttons.TRIANGLE).whenPressed(()->Shooter.motor1.setVelocity(0));
@@ -91,8 +95,14 @@ public class TestOpMode extends BetterOpMode {
 
         now= System.nanoTime();
         telemetry.addData("hz", 1e9/(now- last));
-        telemetry.addData("hz2", hz);
+        //telemetry.addData("hz2", hz);
         telemetry.addData("hz3", hz2);
+        telemetry.addData("tracking", Turret.tracking);
+        telemetry.addData("heaing", robot.robotHeading);
+        telemetry.addData("x", Turret.x);
+        telemetry.addData("y", Turret.y);
+        telemetry.addData("xCorner", Turret.xCorner);
+        telemetry.addData("yCorner", Turret.yCorner);
         telemetry.update();
         last= now;
         robot.update();

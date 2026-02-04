@@ -35,6 +35,7 @@ import static org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constan
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
@@ -191,6 +192,11 @@ public class Chassis implements Runnable{
             return getDistanceFromTarget() < distanceConstraint && getRadiansFromHeadingGoal() < headingConstraint && localizer.getHeadingVelocity()< headingVelocityConstraint && localizer.getXYVelocity()< XYVelocityConstraint;
         }
     }
+    public boolean finished(double sec){
+        synchronized (this) {
+            return (getDistanceFromTarget() < distanceConstraint && getRadiansFromHeadingGoal() < headingConstraint && localizer.getHeadingVelocity()< headingVelocityConstraint && localizer.getXYVelocity()< XYVelocityConstraint) || pathTimer.seconds()> sec;
+        }
+    }
 
     public void turnTo(double h){
         synchronized (this) {
@@ -202,6 +208,7 @@ public class Chassis implements Runnable{
             return getRadiansFromHeadingGoal() < headingConstraint && localizer.getHeadingVelocity()< headingVelocityConstraint;
         }
     }
+    ElapsedTime pathTimer;
     boolean finishedTurning(double radians){
         synchronized (this) {
             return Math.abs(getRadiansFromHeadingGoal()) < radians && localizer.getHeadingVelocity()< headingVelocityConstraint;
@@ -260,13 +267,14 @@ public class Chassis implements Runnable{
         localizer.setStartingPose(p);
         targetPosition= p;
         currentPose= p;
-        localizer.resetLocalizer();
+        //localizer.resetLocalizer();
     }
     public Pose currentPose= new Pose();
     public Pose targetPosition= new Pose();
     boolean finished= true;
     public void lineToConstant(Pose p){
         synchronized (this) {
+            pathTimer= new ElapsedTime();
             targetPosition = p;
             movementHeading = MovementHeading.CONSTANT;
             finished = false;
@@ -276,6 +284,7 @@ public class Chassis implements Runnable{
     public double totalDistance;
     public void lineToLinear(Pose p){
         synchronized (this) {
+            pathTimer= new ElapsedTime();
             movementStartPose = localizer.getCurrentPosition();
             movementStartPose = localizer.getCurrentPosition();
             targetPosition = p;
@@ -288,6 +297,7 @@ public class Chassis implements Runnable{
 
     public void lineToTangential(Pose p){
         synchronized (this) {
+            pathTimer= new ElapsedTime();
             movementStartPose = localizer.getCurrentPosition();
             targetPosition = p;
             movementHeading = MovementHeading.TANGENTIAL;
@@ -297,6 +307,7 @@ public class Chassis implements Runnable{
     }
     public void lineToTangential(Pose p, boolean reversed){
         synchronized (this) {
+            pathTimer= new ElapsedTime();
             movementStartPose = localizer.getCurrentPosition();
             targetPosition = p;
             movementHeading = MovementHeading.TANGENTIAL;
@@ -427,7 +438,7 @@ public class Chassis implements Runnable{
 
                 targetHeading = PinpointV1.normalizeHeading(targetHeading);
 
-                drivetrain.updateAuto(yRotated * maxPower, -xRotated * maxPower, theta * maxPower);
+                drivetrain.updateAuto(-yRotated * maxPower, -xRotated * maxPower, theta * maxPower);
                 drivetrain.write();
 
             }

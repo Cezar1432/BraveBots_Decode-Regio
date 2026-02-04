@@ -29,12 +29,13 @@ public class BetterSwerveAuto extends BetterOpMode {
         r.initialize();
         drive= new Chassis(r, Chassis.Control.AUTO, Chassis.Localizers.PINPOINT_V1, Chassis.Drivetrain.SWERVE);
         drive.localizer.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
-        drive.localizer.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        drive.localizer.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         drive.drivetrain.setCoefs(new PDSFCoefficients(3, .5,0,0))
                 .setWheelBase(34.4)
                 .setTrackWidth(26.7);
 
         opModeScheduler.addChassis(drive);
+        drive.setStartingPosition(new Pose(0,0, Math.toRadians(-90)));
 
     }
 
@@ -48,7 +49,13 @@ public class BetterSwerveAuto extends BetterOpMode {
         r.update();
         drive.update();
         if(gamepadEx1.getButton(BetterGamepad.Buttons.CROSS).wasPressed())
-            opModeScheduler.lineToConstantAsync(new Pose(24, -48,0));
+            opModeScheduler.lineToConstantAsync(new Pose(24, -48,Math.toRadians(-90)));
+
+        telemetry.addData("current x", drive.getCurrentPosition().getX());
+        telemetry.addData("current y", drive.getCurrentPosition().getY());
+        telemetry.addData("current theta", drive.getCurrentPosition().getTheta());
+
+        telemetry.update();
     }
 
     @Override
