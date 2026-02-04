@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.Shoot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
@@ -54,8 +55,8 @@ public class TestOpMode extends BetterOpMode {
         gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN)
                         .whenPressed(()-> Turret.setTracking(false));
 
-        gamepadEx1.getButton(BetterGamepad.Buttons.SQUARE).whenPressed(()-> Shooter.motor1.setVelocity(-1400));
-        gamepadEx1.getButton(BetterGamepad.Buttons.TRIANGLE).whenPressed(()->Shooter.motor1.setVelocity(0));
+        gamepadEx1.getButton(BetterGamepad.Buttons.RIGHT_BUMPER)
+                .whenPressed(new Shoot());
 
         thread2= new Thread(()->{
             while (logicRunning2 && !Thread.interrupted()) {
@@ -108,6 +109,7 @@ public class TestOpMode extends BetterOpMode {
         robot.update();
         drive.write();
         Turret.write();
+        Shooter.write();
     }
 
     @Override

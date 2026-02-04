@@ -29,6 +29,7 @@ public class Turret {
 
     public static double filterParameter= 1;
     static LowPassFilter filter= new LowPassFilter(0, filterParameter);
+    public static double goalCircleRasius= .18;//m
     public static BetterMotor m;
     //public static double p = 0.02, d = 0.0006, i = 0.05, f = 0, st = 0, s = 0,p2=0,d2=0,i2=0,f2=0;
     //public static double p = 0.009, d = 0.0007, i = 0, f = 0, st = 0, s = 0.065,p2=0.03,d2=0.00004,i2=0,f2=0;
@@ -188,6 +189,7 @@ public class Turret {
     public static double targetTicks= 0;
     public static double minTicks= -ticksPerRevolution/2, maxTicks= ticksPerRevolution/2;
     public synchronized static void update(){
+
         /*
         if(s.getTotalPosition()< GEAR_RATIO* MAX_POSSIBLE_REVS + NEUTRAL_POSITION || s.getTotalPosition()> -(GEAR_RATIO* MAX_POSSIBLE_REVS) + NEUTRAL_POSITION) {
             action = Action.BACK_TO_NEUTRAL;
@@ -286,6 +288,8 @@ public class Turret {
 
                 dist = Math.hypot(xCorner, yCorner);
 
+                xCorner-= goalCircleRasius;
+                yCorner-= goalCircleRasius;
                 fieldRelative = Math.atan(xCorner / yCorner);
                 fieldRelative = Math.toDegrees(fieldRelative);
                 if (Robot.a == Alliance.BLUE)

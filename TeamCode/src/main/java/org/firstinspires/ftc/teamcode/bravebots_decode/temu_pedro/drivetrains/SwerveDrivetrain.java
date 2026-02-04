@@ -366,7 +366,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
             fl.setState(-flSpeed, toDegrees(flAngle));
             fr.setState(frSpeed, toDegrees(frAngle));
             bl.setState(-brSpeed, toDegrees(blAngle));
-            br.setState(blSpeed, toDegrees(brAngle));
+            br. setState(blSpeed, toDegrees(brAngle));
 
             lastFLangle = flAngle;
             lastFRangle = frAngle;

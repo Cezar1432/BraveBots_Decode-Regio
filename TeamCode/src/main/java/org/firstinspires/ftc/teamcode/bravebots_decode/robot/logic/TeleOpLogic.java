@@ -127,7 +127,7 @@ public class TeleOpLogic {
     public void write(){
         drive.write();
         Turret.write();
-
+        Shooter.write();
         logicHz= 1e9/(System.nanoTime()- lastLogicTime);
         lastLogicTime= System.nanoTime();
     }

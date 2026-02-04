@@ -26,14 +26,15 @@ public class Shooter {
     public static DcMotorEx motor1, motor2;
     public static double p = 20, i, d, f = 15;
     public static EvenBetterServo s;
-    public static boolean velocitystop = false;
+    public static boolean velocitystop = false,shooting = false;
     public static double hoodincrement= 0.045,shootTime=0.12,coefNiggaMan=1.3,waitForNigga=3, hoodtunabil = 0;
     public static double  MAX_RPM = 5800;
     public static double up_pos = 0.2231;
     public static final double g= 9.81;
     public static double hoodangle = 0;
-    public static double rpm, pos, testingrpm, ballvelocity = 0;
+    public static double rpm, pos, testingrpm, ballvelocity = 0,vel;
     public static Vector robotmovementvector=new Vector(0,0);
+
 
     public static double rpmThreshhold = 400;
     static PIDFCoefficients shootercoeffs = new PIDFCoefficients(p, i, d, f);
@@ -176,7 +177,8 @@ public class Shooter {
     public static double coordinateTheta,parralelvelocity,launchVelocityForY,newXVelocity,compensatedVelocitY, turretOffset;
     public static double distt, tangentialvelocity = 0, time;
     public static Vector robotVelocity= new Vector(0,0);
-    public static final double a1 = -0.209925, b1 = 1.03941, c1 = -1.1534;
+    public static final double a1 = -0.0641147, b1 = 0.390703, c1 = 0.18375;
+    public static final double a2 = -100.04613, b2 = 804.30749, c2 = 357.66532;
     public static double inc=1;
     public static void calculateShooterVelocity(double robotheading) {
         double x = Math.hypot(Turret.xCorner, Turret.yCorner)- ShooterConstants.PASS_THROUGH_POINT_RADIUS;
@@ -211,18 +213,20 @@ public class Shooter {
 
     public static void set(){
         velocitystop=false;
-        distt = Math.hypot(Turret.xCorner, Turret.yCorner);
-        if(distt  > 2.90) {
-            HoodPos = 0.0122;
-            rpm = 4500;
-            rpmThreshhold = 650;
-        }else {
-            HoodPos = Range.clip(a1 * Math.pow(distt, 2) + b1 * distt + c1, 0, 1);
-            rpm = 3700;
-            rpmThreshhold = 400;
+        distt = Turret.dist;
+        if(distt < 1.65) {
+            HoodPos = 0.63;
+            vel = 1400;
         }
-        s.setPosition(HoodPos);
-        setRPM(rpm);
+        else if(distt>3.28)
+        {
+            HoodPos = 0.75;
+            vel =2000;
+        }
+        else {
+            HoodPos = Range.clip(a1 * Math.pow(distt, 2) + b1 * distt + c1, 0.58, 0.789);
+            vel = Math.pow(distt,2)*a2+b2*distt+c2;
+        }
     }
     public static void setPow(){
         Power= MathStuff.getLinearFunction(1.62, 2.88, 3600, 4500, Math.hypot(Turret.xCorner,Turret.yCorner));
@@ -307,9 +311,13 @@ public class Shooter {
 
 
     public static void update(){
-
+        set();
     }
-
+    public static void write(){
+        if(!shooting)
+            s.setPosition(HoodPos);
+        setVelocity(vel);
+    }
 
 
 }

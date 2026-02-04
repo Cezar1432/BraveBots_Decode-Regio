@@ -28,31 +28,71 @@ public class ShooterCalibrationTeodor extends LinearOpMode {
     Thread thread2;
     Scheduler currentTask;
     public static double velocity;
-    public static double increment= 0, waitTime= 0, waitTime2= 0;
+    public static double coef = 2, increment= -0.015, waitTime= 0.28, waitTime2= 0.13;
     public static double p=0,d=0,i=0,f=0;
+    private static double pos;
     public BetterGamepad gamepadEx1, gamepadEx2;
     boolean logicRunning2= false;
-    public static class ShootFortaTunabil implements Task {
+    public static class ShootPeRandTunabil implements Task {
         private final Scheduler s;
-        public ShootFortaTunabil(double vel){
-            s= new Scheduler();
 
-            s.addTask(()-> {
+        public ShootPeRandTunabil(double vel) {
+            s = new Scheduler();
+
+            s.addTask(() -> {
                         Shooter.setVelocity(velocity);
                         Intake.start();
-            })
-                    .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(vel))< Shooter.velocityThreshold)
-                    .addTask(Spindexer::shootRandom)
+                        pos = Shooter.s.getPosition();
+                    })
+                    .addTask(() -> Math.abs(Math.abs(Shooter.motor1.getVelocity()) - Math.abs(vel)) < Shooter.velocityThreshold)
+                    .addTask(() -> {
+                        Spindexer.turnTo(Spindexer.Slots.EJECT1);
+                    })
                     .waitSeconds(waitTime)
-                    .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+increment))
+                    .addTask(() -> Shooter.s.setPosition(pos + increment))
+                    .addTask(() -> Math.abs(Math.abs(Shooter.motor1.getVelocity()) - Math.abs(vel)) < Shooter.velocityThreshold)
+                    .addTask(() -> Spindexer.turnTo(Spindexer.Slots.EJECT2))
                     .waitSeconds(waitTime2)
-                    .addTask(()->Shooter.s.setPosition(Shooter.s.getPosition()+ increment))
+                    .addTask(() -> Shooter.s.setPosition(pos + coef * increment))
+                    .addTask(() -> Math.abs(Math.abs(Shooter.motor1.getVelocity()) - Math.abs(vel)) < Shooter.velocityThreshold)
+                    .addTask(() -> Spindexer.turnTo(Spindexer.Slots.EJECT3))
                     .waitSeconds(1)
                     .addTask(Spindexer::turnBack)
-                    .addTask(()->{
+                    .addTask(() -> {
+                        Shooter.s.setPosition(pos);
                         Shooter.setVelocity(1300);
                     });
         }
+        @Override
+        public boolean Run() {
+            s.update();
+            return s.done();
+        }
+    }
+        public static class ShootFortaTunabil implements Task {
+            private final Scheduler s;
+
+            public ShootFortaTunabil(double vel){
+                s= new Scheduler();
+
+                s.addTask(()-> {
+                            Shooter.setVelocity(velocity);
+                            Intake.start();
+                            pos = Shooter.s.getPosition();
+                        })
+                        .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(vel))< Shooter.velocityThreshold)
+                        .addTask(Spindexer::shootRandom)
+                        .waitSeconds(waitTime)
+                        .addTask(()->Shooter.s.setPosition(pos+increment))
+                        .waitSeconds(waitTime2)
+                        .addTask(()->Shooter.s.setPosition(pos+coef* increment))
+                        .waitSeconds(1)
+                        .addTask(Spindexer::turnBack)
+                        .addTask(()->{
+                            Shooter.s.setPosition(pos);
+                            Shooter.setVelocity(1300);
+                        });
+            }
 
         @Override
         public boolean Run() {
@@ -76,6 +116,10 @@ public class ShooterCalibrationTeodor extends LinearOpMode {
                 .setCoefs(new PDSFCoefficients(3, 0.5, 0, 0))
                 .setSuppliers(() -> gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_X), () -> gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_Y), () -> gamepadEx1.getDouble(BetterGamepad.Trigger.RIGHT_X));
 
+        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP)
+                .whenPressed(()-> Turret.setTracking(true));
+        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN)
+                .whenPressed(()-> Turret.setTracking(false));
         gamepadEx1.getButton(BetterGamepad.Buttons.CROSS).whenPressed(Intake::toggle);
         gamepadEx1.getButton(BetterGamepad.Buttons.TOUCHPAD).whenPressed(()->{
             if (Robot.a == Alliance.BLUE) {  //Robot.pp.resetPosAndIMU();
@@ -128,11 +172,8 @@ public class ShooterCalibrationTeodor extends LinearOpMode {
         thread2.start();
         Turret.setTracking(true);
         while (opModeIsActive()){
-            if(gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN).wasPressed()){
-                Shooter.motor1.setVelocity(-velocity);
-                Shooter.motor2.setVelocity(-velocity);
-            }
-            if(gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP).wasPressed()) {
+            telemetry.addData("thread2 id",thread2.getId());
+            if(gamepadEx1.getButton(BetterGamepad.Buttons.SQUARE).wasPressed()) {
                 currentTask.addTask(new ShootFortaTunabil(velocity));
                 //nigg= true;
             }
@@ -144,12 +185,9 @@ public class ShooterCalibrationTeodor extends LinearOpMode {
             telemetry.addData("pos", Shooter.s.getPosition());
             telemetry.addData("vel", Shooter.motor1.getVelocity());
             telemetry.addData("vel 2", Shooter.motor2.getVelocity());
-            telemetry.addData("encoderTurret",Turret.m.getCurrentPosition());
-            telemetry.addData("p", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).p);
-            telemetry.addData("d", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).d);
-            telemetry.addData("i", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).i);
-            telemetry.addData("f", Shooter.motor1.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).f);
+            telemetry.addData("distance",Math.hypot(Turret.xCorner,Turret.yCorner));
             telemetry.addData("tracking", Turret.tracking);
+            telemetry.addData("pos", Turret.getTicks());
             telemetry.update();
             gamepadEx1.update();
 
@@ -159,5 +197,6 @@ public class ShooterCalibrationTeodor extends LinearOpMode {
             Turret.write();
         }
         logicRunning2 = false;
+        thread2.interrupt();
     }
 }

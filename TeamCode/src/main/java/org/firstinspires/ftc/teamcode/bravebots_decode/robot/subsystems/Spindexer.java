@@ -23,7 +23,7 @@ public class Spindexer{
      }
 
      public enum Slots{
-         SLOT_1(0.4656,0), SLOT_2(.345,0), SLOT_3(.2217,0);
+         SLOT_1(0.4656,0), SLOT_2(.345,0), SLOT_3(.2217,0),EJECT1(0.38,0),EJECT2(0.5117,0),EJECT3(0.6233,0);
 
          final double frontPose, shootPose;
         // final double shootPose;
@@ -48,7 +48,7 @@ public class Spindexer{
          turnTo(Slots.SLOT_1);
      }
 
-     public static double minimumTime= 800;
+     public static double minimumTime= 350;
      static double lastTime= 0;
      public static Slots currentSlot= Slots.SLOT_1;
 
