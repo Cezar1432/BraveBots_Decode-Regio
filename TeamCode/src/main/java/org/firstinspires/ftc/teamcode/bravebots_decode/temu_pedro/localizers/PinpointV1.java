@@ -118,7 +118,7 @@ public class PinpointV1 implements Localizer {
     public static double xGlide, yGlide;
 
 
-    double heading, x, y, xVelocity, yVelocity;
+    public double heading, x, y, xVelocity, yVelocity;
     public void updateGlide(){
 
         xRobotVelocity = xVelocity * Math.cos(-heading) - yVelocity * Math.sin(-heading);
@@ -169,8 +169,8 @@ public class PinpointV1 implements Localizer {
         xVelocity = xVelocityFilter.getValue(odo.getVelX(DistanceUnit.MM));
         yVelocity = yVelocityFilter.getValue(odo.getVelY(DistanceUnit.MM));
         updateGlide();
-        predictedX = x - xGlide;
-        predictedY = y - yGlide;
+        predictedX = x + xGlide;
+        predictedY = y + yGlide;
     }
 
 

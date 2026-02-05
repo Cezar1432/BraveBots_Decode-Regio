@@ -10,25 +10,26 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.ResetTurret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.Shoot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @TeleOp(
         name = "LinearOpModeEx Test"
 )
+@Deprecated
 public class TestOpMode extends BetterOpMode {
     Robot robot;
     public SwerveDrivetrain drive;
-    Thread thread;
     Thread thread2;
     boolean logicRunning= false, logicRunning2= false;
-    boolean allianceSet= false;
-    volatile double hz, hz2;
-    volatile double now2, last2, now3, last3;
+    volatile double hz2;
+    volatile double  now3, last3;
     @Override
     public void initialize() {
         robot= new Robot(hardwareMap, telemetry, Alliance.BLUE);
@@ -51,13 +52,12 @@ public class TestOpMode extends BetterOpMode {
             Turret.setAngle(turretAngle);
             Robot.odo.setHeading(90, AngleUnit.DEGREES);
         });
-        gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP)
-                        .whenPressed(()-> Turret.setTracking(true));
+        gamepadEx1.getButton(BetterGamepad.Buttons.LEFT_BUMPER)
+                        .whenPressed(()-> Turret.setState(Turret.State.TRACKING));
         gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN)
-                        .whenPressed(()-> Turret.setTracking(false));
+                        .whenPressed(()-> Turret.setState(Turret.State.STATIC));
 
-//        gamepadEx1.getButton(BetterGamepad.Buttons.RIGHT_BUMPER)
-//                .whenPressed(new Shoot());
+
 
         thread2= new Thread(()->{
             while (logicRunning2 && !Thread.interrupted()) {
@@ -72,6 +72,7 @@ public class TestOpMode extends BetterOpMode {
                     Shooter.update();
                     Spindexer.update();
                     //robot.update();
+                    //noinspection BusyWait
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -82,6 +83,7 @@ public class TestOpMode extends BetterOpMode {
         thread2.setPriority(5);
 
         telemetry.setMsTransmissionInterval(1000);
+
 
 
     }
@@ -97,18 +99,20 @@ public class TestOpMode extends BetterOpMode {
 
         if(gamepadEx1.getButton(BetterGamepad.Buttons.RIGHT_BUMPER).wasPressed())
             opModeScheduler.addTask(new Shoot());
+        if(gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_UP).wasPressed())
+            opModeScheduler.addTask(new ResetTurret(Turret.State.STATIC));
         now= System.nanoTime();
         telemetry.addData("hz", 1e9/(now- last));
         //telemetry.addData("hz2", hz);
         telemetry.addData("hz3", hz2);
-        telemetry.addData("tracking", Turret.tracking);
-        telemetry.addData("heaing", robot.robotHeading);
-        telemetry.addData("x", Robot.odo.getPosX(DistanceUnit.METER));
-        telemetry.addData("y", Robot.odo.getPosY(DistanceUnit.METER));
-//        telemetry.addData("x", Turret.x);
-//        telemetry.addData("y", Turret.y);
-//        telemetry.addData("xCorner", Turret.xCorner);
-//        telemetry.addData("yCorner", Turret.yCorner);
+        telemetry.addData("turret state", Turret.getState());
+//        telemetry.addData("heading", robot.robotHeading);
+        telemetry.addData("x", Turret.x);
+        telemetry.addData("y", Turret.y);
+        telemetry.addData("turret angle", Turret.getAngle());
+        telemetry.addData("targetticks",Turret.targetTicks);
+        telemetry.addData("pos",Turret.getTicks()-Turret.ticksPerRevolution/2);
+        telemetry.addData("heading", LimelightMath.robotHeading);
         telemetry.update();
         last= now;
         robot.update();
@@ -122,7 +126,7 @@ public class TestOpMode extends BetterOpMode {
         //logicRunning= true;
         logicRunning2= true;
         thread2.start();
-        Turret.reset();
+        opModeScheduler.addTask(new ResetTurret(Turret.State.STATIC));
         Spindexer.turnBack();
     }
 

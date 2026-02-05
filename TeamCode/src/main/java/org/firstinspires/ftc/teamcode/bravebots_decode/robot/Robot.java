@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.robot;
 
 
+import android.graphics.Path;
+
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -118,6 +120,7 @@ public class Robot {
         Spindexer.colorSensor= colorSensor;
         Turret.m= turret;
         LimelightMath.ll = ll;
+        LimelightMath.robot= this;
 
     }
 
@@ -173,6 +176,13 @@ public class Robot {
     }
 
 
+    public enum OpModeType{
+        TELEOP, AUTO
+    }
+    OpModeType opModeType= OpModeType.TELEOP;
+    public void setOpModeType(OpModeType type){
+        opModeType= type;
+    }
     ElapsedTime timer;
     public void update(){
         if(timer== null)
@@ -181,13 +191,15 @@ public class Robot {
         //hubs.forEach(LynxModule::close);
 
 
-        odo.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
+
+        if(opModeType== OpModeType.TELEOP)
+            odo.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
 
         robotHeading = odo.getHeading(AngleUnit.DEGREES);
 
         // odo.update();
 
-        if(Turret.tracking) {
+        if(Turret.getState()== Turret.State.TRACKING) {
             updatedHeading = LimelightMath.getLimelightUpdateAngle();
             ll.updateRobotOrientation(updatedHeading);
         }

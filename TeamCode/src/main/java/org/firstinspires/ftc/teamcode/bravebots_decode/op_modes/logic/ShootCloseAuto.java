@@ -21,7 +21,7 @@ public class ShootCloseAuto implements Task {
     public ShootCloseAuto(){
         s= new Scheduler();
 
-        Turret.auto(true);
+        Turret.setState(Turret.State.AUTO);
         Turret.setDegrees(-90);
         //                    Shooter.setVelocity(vel);
         //                    Shooter.s.setPosition(pos);

@@ -437,7 +437,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         radius= hypot(trackWidth, wheelBase);
         //rotation= rotation* smth2;
 
-        if(Math.abs(strafeX) > 0.08 || Math.abs(strafeY)> 0.08 || Math.abs(rotation)> 0.08) {
+        if(Math.abs(strafeX) > 0.01 || Math.abs(strafeY)> 0.01 || Math.abs(rotation)> 0.01) {
             strafeX*=-1;
             rotation *= -1.1;
             double rawMax= Math.max(Math.abs(strafeX), Math.max(Math.abs(strafeY), Math.abs(rotation)));

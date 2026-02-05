@@ -19,7 +19,7 @@ public class Shoot implements Task {
         s.addTask(()-> {
                     Shooter.shooting = true;
                     Intake.start();
-                    Turret.setTracking(true);
+                    Turret.setState(Turret.State.TRACKING);
                 })
                 .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(Shooter.vel))< Shooter.velocityThreshold)
                 .addTask(Spindexer::shootRandom)
@@ -31,13 +31,15 @@ public class Shoot implements Task {
                 .addTask(Spindexer::turnBack)
                 .addTask(()->{
                     Shooter.shooting = false;
-                    Turret.setTracking(false);
                     //Shooter.setVelocity(1300);
-                });
+                })
+                .addTask(new ResetTurret(Turret.State.STATIC));
     }
 
     @Override
     public boolean Run() {
+        Shooter.update();
+        Shooter.write();
         s.update();
         return s.done();
     }

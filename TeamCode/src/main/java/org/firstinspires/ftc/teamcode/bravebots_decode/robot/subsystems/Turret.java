@@ -23,9 +23,12 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMoto
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
 
 import java.util.List;
-
+@Configurable
 public class Turret {
 
+    public static State getState(){
+        return state;
+    }
 
     public static double filterParameter= 1;
     static LowPassFilter filter= new LowPassFilter(0, filterParameter);
@@ -109,10 +112,7 @@ public class Turret {
         */
     }
 
-    public enum States{
-        UPDATE, RESET
-    }
-    public static States state= States.RESET;
+
     public static ElapsedTime timer= new ElapsedTime();
     public static ElapsedTime updateTimer= new ElapsedTime();
 
@@ -194,8 +194,8 @@ public class Turret {
         Turret.degrees= degrees;
     }
     public static final double /*ticksPerRevolution= 24272.6,*/ ticksPerRevolution=40960, ticksPerDegree= ticksPerRevolution/ 360.0;
-    public static double targetTicks= 0;
-    public static double minTicks= -ticksPerRevolution/2, maxTicks= ticksPerRevolution/2;
+    public static double targetTicks= 0,targetTicksTuning=0;
+    public static double minTicks= -ticksPerDegree* 177, maxTicks= ticksPerRevolution*177;
     public synchronized static void update(){
 
         /*
@@ -264,7 +264,7 @@ public class Turret {
 
 /// /////////////////////////////
 
-        if(tracking) {
+        if(state== State.TRACKING) {
 
             try {
                 LLResult res = LimelightMath.getResults();
@@ -287,8 +287,8 @@ public class Turret {
                 android.util.Log.e("Turrret", e.getMessage(), e);
             }
 
-            if (positionll!= null && positionll.x != 0 && positionll.y != 0) {
-                y =positionll.y;
+            if (positionll != null && positionll.x != 0 && positionll.y != 0) {
+                y = positionll.y;
                 x = -positionll.x;
 
                 yCorner = Robot.a == Alliance.RED ? FIELD_LENGTH / 2 - y : FIELD_LENGTH / 2 + y;
@@ -296,8 +296,8 @@ public class Turret {
 
                 dist = Math.hypot(xCorner, yCorner);
 
-                xCorner-= goalCircleRasius;
-                yCorner-= goalCircleRasius;
+                xCorner -= goalCircleRasius;
+                yCorner -= goalCircleRasius;
                 fieldRelative = Math.atan(xCorner / yCorner);
                 fieldRelative = Math.toDegrees(fieldRelative);
                 if (Robot.a == Alliance.BLUE)
@@ -308,8 +308,8 @@ public class Turret {
                 robotRelative = Robot.a == Alliance.RED ? robotRelative : -robotRelative;
                 targetTicks = ticksPerDegree * turretRelative;
                 targetTicks = Range.clip(targetTicks, minTicks, maxTicks);
-                c.setPIDF(p, i, d, f);
 
+                c.setPIDF(p, i, d, f);
 
                 // if (timer.milliseconds() > UPDATE_PERIOD && Math.abs(lastAngle - robotRelative) > angleThreshold) {
                 //setAngle(turretRelative);
@@ -327,28 +327,41 @@ public class Turret {
 //            s1.setPower(-power);
 //            s2.setPower(power);
             }
-            else{
+        }
+            else if(state== State.STATIC){
                 targetTicks= 0;
             }
-        }
+            else if(state== State.AUTO){
+                targetTicks= degrees * ticksPerDegree ;
+
+            }
+
+
 
 
 
 
     }
+
+    public static void setState(State state){
+        Turret.state= state;
+    }
     public static void write(){
-        if(tracking) {
-            power = c.calculate(m.getCurrentPosition(), targetTicks);
-            m.setPower(power);
-        }
-        else if(auto){
-            double ticks= degrees * ticksPerDegree;
-            power= c.calculate(m.getCurrentPosition(), ticks);
-            m.setPower(power);
-        }
-        else {
-            power= c.calculate(m.getCurrentPosition(), 0);
-            m.setPower(power);
+
+        switch (state){
+            case TRACKING:
+            case AUTO:
+                c.setPIDF(p, i, d, f);
+                power = c.calculate(m.getCurrentPosition()- ticksPerRevolution/2, targetTicks);
+                m.setPower(power);
+                break;
+            case STATIC:
+                c.setPIDF(p, i, d, f);
+                power= c.calculate(m.getCurrentPosition()- ticksPerRevolution/2, 0);
+                m.setPower(power);
+                break;
+            case RESET:
+
         }
     }
 //    public static double getAngle(){
@@ -367,8 +380,13 @@ public class Turret {
         return m.getCurrentPosition();
     }
     public static double getAngle(){
-        return getTicks()/ ticksPerDegree;
+        return (getTicks()- ticksPerRevolution/2)/ ticksPerDegree;
     }
+
+    public enum State{
+        TRACKING, AUTO, RESET, STATIC, NOTHING
+    }
+    static State state= State.NOTHING;
 
 
 

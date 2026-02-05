@@ -220,8 +220,8 @@ public class Shooter {
         }
         else if(distt>3.28)
         {
-            HoodPos = 0.75;
-            vel =2000;
+            HoodPos = 0.79;
+            vel =2080;
         }
         else {
             HoodPos = Range.clip(a1 * Math.pow(distt, 2) + b1 * distt + c1, 0.58, 0.789);

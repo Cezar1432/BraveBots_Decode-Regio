@@ -20,7 +20,7 @@ public class LimelightMath {
     public static double goalAngle= Math.toRadians(54), xOffset= 0.0, yOffset= 0.0;
     //y = 31, x = 38
 
-    static Robot robot= Robot.getInstance();
+    public static Robot robot;
     public static LLResult getResults(){
 
         LLResult res= ll.getLatestResult();
@@ -96,8 +96,10 @@ public class LimelightMath {
         updateShooterOutput();
         return RPM;
     }
+    public static double robotHeading;
     public static double getLimelightUpdateAngle(){
-        double chassisAngle= robot.odo.getHeading(AngleUnit.DEGREES);
+        robotHeading= robot.robotHeading;
+        double chassisAngle= robotHeading;
         double llAngle= MathStuff.normalizeDegrees(chassisAngle- 180);
         llAngle= MathStuff.normalizeDegrees(llAngle+ Turret.getAngle());
         llAngle= MathStuff.normalizeDegrees(llAngle+ 90);

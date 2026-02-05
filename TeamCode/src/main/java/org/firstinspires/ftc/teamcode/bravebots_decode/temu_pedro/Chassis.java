@@ -50,7 +50,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMoto
 public class Chassis implements Runnable{
 
     BetterMotor frontLeft, frontRight, backLeft, backRight;
-    public Localizer localizer;
+    public PinpointV1 localizer;
     public DrivetrainInterface drivetrain;
    // public SwerveDrivetrain swerveDrivetrain;
 
@@ -208,7 +208,7 @@ public class Chassis implements Runnable{
             return getRadiansFromHeadingGoal() < headingConstraint && localizer.getHeadingVelocity()< headingVelocityConstraint;
         }
     }
-    ElapsedTime pathTimer;
+    public ElapsedTime pathTimer;
     boolean finishedTurning(double radians){
         synchronized (this) {
             return Math.abs(getRadiansFromHeadingGoal()) < radians && localizer.getHeadingVelocity()< headingVelocityConstraint;
@@ -425,6 +425,11 @@ public class Chassis implements Runnable{
 
                         targetHeading = targetPosition.getNormalizedTheta();
                         hError= MathStuff.normalizeRadians(targetHeading- currentPose.getNormalizedTheta());
+                       /* if(Math.abs(hError)< Math.toRadians(25))
+                        {
+                            xRotated= 0;
+                            yRotated= 0;
+                        }*/
                         if (!useSecondaryHeading || Math.abs(PinpointV1.normalizeHeading(currentPose.getTheta() - targetPosition.getTheta())) > headingThreshold)
                             theta = heading.calculate(0, hError);
                         else
