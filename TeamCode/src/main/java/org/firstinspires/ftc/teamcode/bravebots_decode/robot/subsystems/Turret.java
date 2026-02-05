@@ -185,6 +185,14 @@ public class Turret {
 //            s2.setPower(power);
         }
     }
+    public static boolean auto= false;
+    public static double degrees= 0;
+    public static void auto(boolean auto){
+        Turret.auto= auto;
+    }
+    public static void setDegrees(double degrees){
+        Turret.degrees= degrees;
+    }
     public static final double /*ticksPerRevolution= 24272.6,*/ ticksPerRevolution=40960, ticksPerDegree= ticksPerRevolution/ 360.0;
     public static double targetTicks= 0;
     public static double minTicks= -ticksPerRevolution/2, maxTicks= ticksPerRevolution/2;
@@ -331,6 +339,11 @@ public class Turret {
     public static void write(){
         if(tracking) {
             power = c.calculate(m.getCurrentPosition(), targetTicks);
+            m.setPower(power);
+        }
+        else if(auto){
+            double ticks= degrees * ticksPerDegree;
+            power= c.calculate(m.getCurrentPosition(), ticks);
             m.setPower(power);
         }
         else {

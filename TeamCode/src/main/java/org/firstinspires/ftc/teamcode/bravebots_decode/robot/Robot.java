@@ -172,6 +172,7 @@ public class Robot {
         assignHardware();
     }
 
+
     ElapsedTime timer;
     public void update(){
         if(timer== null)
@@ -180,7 +181,7 @@ public class Robot {
         //hubs.forEach(LynxModule::close);
 
 
-        odo.update();
+        odo.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
 
         robotHeading = odo.getHeading(AngleUnit.DEGREES);
 

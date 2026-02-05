@@ -4,8 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Poses;
+import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.logic.ShootCloseAuto;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalScheduler;
+import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalTask;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Chassis;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
@@ -28,14 +35,21 @@ public class TestAuto extends BetterOpMode {
         opModeScheduler.addChassis(c);
         c.setStartingPosition(Poses.startPose);
         super.setSchedulerUpdateInInit(false);
+        //c.setMaxPower(.5);
         opModeScheduler
-                .lineToConstantAsync(Poses.closeShootPose, 3)
-                .lineToConstantAsync(Poses.firstSpikes, 5, Math.toRadians(15))
-                .addTask(()-> {
-                    c.setMaxPower(.5);
-                    Intake.start();
+                .addTask(()->{
+                    Turret.auto(true);
+                    Turret.setDegrees(-90);
+                    Shooter.setVelocity(1800);
+                    Shooter.s.setPosition(.7578);
                 })
-                .lineToConstantAsync(Poses.firstSpikesCollect);
+                .lineToConstantAsync(Poses.closeShootPose, 3)
+                .addTask(new ShootCloseAuto())
+                .lineToConstantAsync(Poses.firstSpikes, 5, Math.toRadians(15))
+                .lineToConstantAsync(Poses.firstSpikesCollect, 4, Math.toRadians(30))
+                .lineToConstantAsync(Poses.closeShootPose,3)
+                .addTask(new ShootCloseAuto());
+
 
 
     }
@@ -61,6 +75,9 @@ public class TestAuto extends BetterOpMode {
         telemetry.update();
         r.update();
         c.update();
+        Spindexer.update();
+        Turret.write();
+
     }
 
     @Override

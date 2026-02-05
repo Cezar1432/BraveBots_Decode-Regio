@@ -27,6 +27,7 @@ public class Constants {
     public static double XYVelocityConstraint= 1;
     public static double headingVelocityConstraint= 0.1;
     public static double xOffset= 16, yOffset= -5.35;
+    public static double trackWidth= 34.4, wheelBase= 26.7;
 
 
 

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.utils;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
@@ -9,6 +10,7 @@ public abstract class BetterOpMode extends LinearOpMode {
 
 
     public BetterGamepad gamepadEx1, gamepadEx2;
+    public ElapsedTime opModeTimer;
     public Scheduler opModeScheduler;
     boolean schedulerUpdateInInit= false;
     public void setSchedulerUpdateInInit(boolean set){
@@ -26,6 +28,7 @@ public abstract class BetterOpMode extends LinearOpMode {
                 opModeScheduler.update();
         }
         waitForStart();
+        opModeTimer= new ElapsedTime();
         init_start();
         while (opModeIsActive()){
             gamepadEx1.update();

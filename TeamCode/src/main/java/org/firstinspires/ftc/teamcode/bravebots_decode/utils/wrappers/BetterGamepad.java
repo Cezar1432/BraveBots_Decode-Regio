@@ -13,6 +13,7 @@ public class BetterGamepad {
     int numberOfButtons= 13;
     Button[] buttons= new Button[numberOfButtons];
     Scheduler scheduler;
+
     public BetterGamepad(Gamepad gp){
         scheduler= new Scheduler();
         this.gp= gp;

@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.Shoot;
+import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
@@ -32,19 +33,19 @@ public class TestOpMode extends BetterOpMode {
     public void initialize() {
         robot= new Robot(hardwareMap, telemetry, Alliance.BLUE);
         robot.initialize();
-        drive= new SwerveDrivetrain(robot).setWheelBase(26.7)
-                .setTrackWidth(34.4)
+        drive= new SwerveDrivetrain(robot).setWheelBase(Constants.wheelBase)
+                .setTrackWidth(Constants.trackWidth)
                 .setCoefs(new PDSFCoefficients(3, 0.5, 0, 0))
                 .setSuppliers(() -> gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_X), () -> gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_Y), () -> gamepadEx1.getDouble(BetterGamepad.Trigger.RIGHT_X));
 
         gamepadEx1.getButton(BetterGamepad.Buttons.CROSS).whenPressed(Intake::toggle);
         gamepadEx1.getButton(BetterGamepad.Buttons.TOUCHPAD).whenPressed(()->{
             if (Robot.a == Alliance.BLUE) {  //Robot.pp.resetPosAndIMU();
-                Robot.odo.setPosX(-12.44 / 2, DistanceUnit.INCH);
-                Robot.odo.setPosY(16.93 / 2, DistanceUnit.INCH);
+                Robot.odo.setPosX((Turret.FIELD_LENGTH- Constants.trackWidth/100/2), DistanceUnit.INCH);
+                Robot.odo.setPosY(Constants.wheelBase/2/100, DistanceUnit.INCH);
             } else {
-                Robot.odo.setPosX(12.44 / 2, DistanceUnit.INCH);
-                Robot.odo.setPosY(16.93 / 2, DistanceUnit.INCH);
+                Robot.odo.setPosX(Constants.trackWidth/100/2, DistanceUnit.INCH);
+                Robot.odo.setPosY(Constants.wheelBase/100 / 2, DistanceUnit.INCH);
             }
             double turretAngle = Robot.a == Alliance.RED ? -135 : 135;
             Turret.setAngle(turretAngle);
@@ -55,8 +56,8 @@ public class TestOpMode extends BetterOpMode {
         gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN)
                         .whenPressed(()-> Turret.setTracking(false));
 
-        gamepadEx1.getButton(BetterGamepad.Buttons.RIGHT_BUMPER)
-                .whenPressed(new Shoot());
+//        gamepadEx1.getButton(BetterGamepad.Buttons.RIGHT_BUMPER)
+//                .whenPressed(new Shoot());
 
         thread2= new Thread(()->{
             while (logicRunning2 && !Thread.interrupted()) {
@@ -94,16 +95,20 @@ public class TestOpMode extends BetterOpMode {
     @Override
     public void activeLoop() {
 
+        if(gamepadEx1.getButton(BetterGamepad.Buttons.RIGHT_BUMPER).wasPressed())
+            opModeScheduler.addTask(new Shoot());
         now= System.nanoTime();
         telemetry.addData("hz", 1e9/(now- last));
         //telemetry.addData("hz2", hz);
         telemetry.addData("hz3", hz2);
         telemetry.addData("tracking", Turret.tracking);
         telemetry.addData("heaing", robot.robotHeading);
-        telemetry.addData("x", Turret.x);
-        telemetry.addData("y", Turret.y);
-        telemetry.addData("xCorner", Turret.xCorner);
-        telemetry.addData("yCorner", Turret.yCorner);
+        telemetry.addData("x", Robot.odo.getPosX(DistanceUnit.METER));
+        telemetry.addData("y", Robot.odo.getPosY(DistanceUnit.METER));
+//        telemetry.addData("x", Turret.x);
+//        telemetry.addData("y", Turret.y);
+//        telemetry.addData("xCorner", Turret.xCorner);
+//        telemetry.addData("yCorner", Turret.yCorner);
         telemetry.update();
         last= now;
         robot.update();
