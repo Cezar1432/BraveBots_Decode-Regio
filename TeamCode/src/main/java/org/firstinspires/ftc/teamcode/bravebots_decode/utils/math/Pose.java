@@ -62,12 +62,18 @@ public class Pose {
         return new double[] {Math.sqrt(x * x + y * y), MathStuff.normalizeRadians(Math.atan2(y, x))};
     }
     public Pose mirrorOnYAxis(){
-       Pose p= getPose();
+       Pose p= this;
        double x, heading;
        x= 144- p.getX();
-       heading= Math.toDegrees(p.getTheta());
-       heading = heading<= 180 ? 180- heading : 540 - heading;
-       return new Pose(x, p.getY(), p.getTheta());
+       heading = p.getTheta();
+       while (heading > 2* Math.PI)
+           heading-= 2 * Math.PI;
+       while (heading< 0)
+           heading+= 2* Math.PI;
+
+       heading= heading<= Math.PI ? Math.PI- heading : 3 * Math.PI - heading;
+
+        return new Pose(x, p.getY(), heading);
     }
 
 

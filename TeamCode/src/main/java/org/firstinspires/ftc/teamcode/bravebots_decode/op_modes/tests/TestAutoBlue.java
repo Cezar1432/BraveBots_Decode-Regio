@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Poses;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.logic.ShootCloseAuto;
@@ -13,7 +12,6 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexe
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
-import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalScheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalTask;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.ResetTurret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Chassis;
@@ -23,31 +21,31 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @Autonomous
-public class TestAuto extends BetterOpMode {
+public class TestAutoBlue extends BetterOpMode {
     Robot r;
     Chassis c;
     Scheduler resetTurret;
     public enum Decision{
         GATE, SPIKES;
     }
-    Decision decision= Decision.SPIKES;
+    TestAuto.Decision decision= TestAuto.Decision.SPIKES;
     public class GateCycle implements Task{
 
         private final Scheduler s;
         public GateCycle(){
             s= new Scheduler(c);
 
-            s.lineToConstantAsync(Poses.intermediateGateOpen, 10, Math.toRadians(30))
-            .lineToConstantAsync(Poses.gateOpenPose, 1.5)
+            s.lineToConstantAsync(Poses.intermediateGateOpen.mirrorOnYAxis(), 10, Math.toRadians(30))
+                    .lineToConstantAsync(Poses.gateOpenPose.mirrorOnYAxis(), 1.5)
                     .waitSeconds(1.5)
-                    .lineToConstantAsync(Poses.intermediateGateOpen, .6)
-                    .lineToConstantAsync(Poses.closeShootPose, 1)
+                    .lineToConstantAsync(Poses.intermediateGateOpen.mirrorOnYAxis(), .6)
+                    .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(), 1)
                     .addTask(new ShootCloseAuto());
         }
 
         @Override
         public boolean Run() {
-            decision= Decision.GATE;
+            decision= TestAuto.Decision.GATE;
             s.update();
             return s.done();
         }
@@ -56,15 +54,15 @@ public class TestAuto extends BetterOpMode {
         private final Scheduler s;
         public ShootFirstSpikes(){
             s= new Scheduler(c);
-            s.lineToConstantAsync(Poses.firstSpikesCollect, 5, .2)
-                    .lineToConstantAsync(Poses.firstSpikesCollect,5, .2)
-                    .lineToConstantAsync(Poses.closeShootPose,2)
+            s
+                    .lineToConstantAsync(Poses.firstSpikesCollect.mirrorOnYAxis(),1)
+                    .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(),2)
                     .addTask(new ShootCloseAuto());
         }
 
         @Override
         public boolean Run() {
-            decision= Decision.SPIKES;
+            decision= TestAuto.Decision.SPIKES;
             s.update();
             return s.done();
         }
@@ -85,22 +83,22 @@ public class TestAuto extends BetterOpMode {
 
         Shooter.s.setPosition(.76);
         opModeScheduler.addChassis(c);
-        c.setStartingPosition(Poses.startPose);
+        c.setStartingPosition(Poses.startPose.mirrorOnYAxis());
         super.setSchedulerUpdateInInit(false);
         //c.setMaxPower(.5);
         opModeScheduler
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
-                    Turret.setDegrees(-90);
+                    Turret.setDegrees(90);
                     Shooter.setVelocity(1600);
                     Shooter.s.setPosition(.76);
                 })
-                .lineToConstantAsync(Poses.closeShootPose, 2.2)
+                .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(), 2.2)
                 .addTask(new ShootCloseAuto())
-                .lineToConstantAsync(Poses.secondSpikes, 5, Math.toRadians(15))
-                .lineToConstantAsync(Poses.secondSpikesCollect, 8, Math.toRadians(30))
-                .lineToConstantAsync(Poses.secondSpikes, .8)
-                .lineToConstantAsync(Poses.closeShootPose,1.1)
+                .lineToConstantAsync(Poses.secondSpikes.mirrorOnYAxis(), 5, Math.toRadians(15))
+                .lineToConstantAsync(Poses.secondSpikesCollect.mirrorOnYAxis(), 8, Math.toRadians(30))
+                .lineToConstantAsync(Poses.secondSpikes.mirrorOnYAxis(), .8)
+                .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(),1.1)
                 .addTask(new ShootCloseAuto())
                 .addTask(new ConditionalTask(
                         new GateCycle()
@@ -140,10 +138,10 @@ public class TestAuto extends BetterOpMode {
 
         initIndexer= new Scheduler()
                 .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_1))
-                        .waitSeconds(2)
-                                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_2))
-                                        .waitSeconds(2)
-                                                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_3));
+                .waitSeconds(2)
+                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_2))
+                .waitSeconds(2)
+                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_3));
         telemetry.setMsTransmissionInterval(500);
 
 
@@ -179,9 +177,9 @@ public class TestAuto extends BetterOpMode {
         telemetry.addData("hood pos", Shooter.s.getPosition());
         last= now;
         predicetedPose= c.localizer.getPredictedPose();
-       // telemetry.addData("current x", c.localizer.getActualPose().getX());
+        // telemetry.addData("current x", c.localizer.getActualPose().getX());
 //        telemetry.addData("predicted x", predicetedPose.getX());
-       // telemetry.addData("current y", c.localizer.getActualPose().getY());
+        // telemetry.addData("current y", c.localizer.getActualPose().getY());
 //        telemetry.addData("predicted y",predicetedPose.getY());
 //        telemetry.addData("current theta", c.getCurrentPosition().getTheta());
 //        telemetry.addData("predicted theta", predicetedPose.getTheta());

@@ -24,7 +24,8 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetter
 public class Shooter {
     public static double velocityThreshold= 50;
     public static DcMotorEx motor1, motor2;
-    public static double p = 20, i, d, f = 15;
+    //public static double p = 20, i, d, f = 15;
+    public static final double p= 30, i=0, d=0, f= 20;
     public static EvenBetterServo s;
     public static boolean velocitystop = false,shooting = false;
     public static double hoodincrement= 0.045,shootTime=0.12,coefNiggaMan=1.3,waitForNigga=3, hoodtunabil = 0;
@@ -71,6 +72,7 @@ public class Shooter {
             wereCoeffsSet = true;
             setCoefs();
         }
+        Shooter.vel = vel;
         motor1.setVelocity(-vel);
         motor2.setVelocity(-vel);
     }

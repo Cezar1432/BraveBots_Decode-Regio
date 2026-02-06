@@ -13,8 +13,12 @@ public abstract class BetterOpMode extends LinearOpMode {
     public ElapsedTime opModeTimer;
     public Scheduler opModeScheduler;
     boolean schedulerUpdateInInit= false;
+    boolean updateGamepadsInInit= false;
     public void setSchedulerUpdateInInit(boolean set){
         schedulerUpdateInInit= set;
+    }
+    public void setGamepadsUpdateInInit(boolean set){
+        updateGamepadsInInit= set;
     }
     @Override
     public void runOpMode() throws InterruptedException {
