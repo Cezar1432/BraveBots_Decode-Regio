@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Chassis;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @Autonomous
 public class TestAuto extends BetterOpMode {
@@ -35,9 +36,9 @@ public class TestAuto extends BetterOpMode {
         private final Scheduler s;
         public GateCycle(){
             s= new Scheduler(c);
-            s.lineToConstantAsync(Poses.gateOpenPose, 6)
-                    .addTask(()->c.pathTimer.seconds()> 2 || Spindexer.currentSlot== Spindexer.Slots.SLOT_3)
-                    .lineToConstantAsync(Poses.closeShootPose, 3)
+            s.lineToConstantAsync(Poses.gateOpenPose, 4)
+                    .waitSeconds(1.5)
+                    .lineToConstantAsync(Poses.closeShootPose, 2)
                     .addTask(new ShootCloseAuto());
         }
 
@@ -53,8 +54,8 @@ public class TestAuto extends BetterOpMode {
         public ShootFirstSpikes(){
             s= new Scheduler(c);
             s.lineToConstantAsync(Poses.firstSpikesCollect, 5, .2)
-                    .lineToConstantAsync(Poses.firstSpikesCollect)
-                    .lineToConstantAsync(Poses.closeShootPose)
+                    .lineToConstantAsync(Poses.firstSpikesCollect,5, .2)
+                    .lineToConstantAsync(Poses.closeShootPose,2)
                     .addTask(new ShootCloseAuto());
         }
 
@@ -67,6 +68,7 @@ public class TestAuto extends BetterOpMode {
     }
 
 
+    Scheduler initIndexer;
     @Override
     public void initialize() {
         r= new Robot(hardwareMap, telemetry, Alliance.BLUE);
@@ -78,6 +80,7 @@ public class TestAuto extends BetterOpMode {
                 .setTrackWidth(26.7)
                 .setCoefs(new PDSFCoefficients(3,.5,0,0));
 
+        Shooter.s.setPosition(.63);
         opModeScheduler.addChassis(c);
         c.setStartingPosition(Poses.startPose);
         super.setSchedulerUpdateInInit(false);
@@ -86,14 +89,14 @@ public class TestAuto extends BetterOpMode {
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
                     Turret.setDegrees(-90);
-                    Shooter.setVelocity(1800);
-                    Shooter.s.setPosition(.7578);
+                    Shooter.setVelocity(1600);
+                    Shooter.s.setPosition(.7);
                 })
-                .lineToConstantAsync(Poses.closeShootPose, 3)
+                .lineToConstantAsync(Poses.closeShootPose, 2.2)
                 .addTask(new ShootCloseAuto())
                 .lineToConstantAsync(Poses.secondSpikes, 5, Math.toRadians(15))
                 .lineToConstantAsync(Poses.secondSpikesCollect, 8, Math.toRadians(30))
-                .lineToConstantAsync(Poses.closeShootPose,3)
+                .lineToConstantAsync(Poses.closeShootPose,2)
                 .addTask(new ShootCloseAuto())
                 .addTask(new ConditionalTask(
                         new GateCycle()
@@ -142,6 +145,12 @@ public class TestAuto extends BetterOpMode {
         resetTurret= new Scheduler();
         resetTurret.addTask(new ResetTurret(Turret.State.AUTO, 90));
 
+        initIndexer= new Scheduler()
+                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_1))
+                        .waitSeconds(2)
+                                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_2))
+                                        .waitSeconds(2)
+                                                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_3));
         telemetry.setMsTransmissionInterval(500);
 
 
@@ -150,7 +159,10 @@ public class TestAuto extends BetterOpMode {
     @Override
     public void initializeLoop() {
 
+        if(gamepadEx1.getButton(BetterGamepad.Buttons.CROSS).wasPressed())
+            Turret.reset();
         resetTurret.update();
+        telemetry.addData("velocity", Turret.m.getVelocity());
         telemetry.addData("TurretPos",Turret.getTicks());
         telemetry.addData("TurretState",Turret.getState());
         telemetry.addData("TurretTarget",Turret.targetTicks);
@@ -159,6 +171,7 @@ public class TestAuto extends BetterOpMode {
         telemetry.addData("current y", c.getCurrentPosition().getY());
         telemetry.addData("current theta", c.getCurrentPosition().getTheta());
         telemetry.update();
+        initIndexer.update();
 
     }
 

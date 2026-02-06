@@ -9,7 +9,7 @@ public class Constants {
 
     public static double pStrafe= 0.02, dStrafe= 0.0006, secondaryPStrafe= 0.02, secondaryDStrafe= 0.0006;
     public static double pForward= 0.02, dForward= 0.0006, secondaryPForward= 0.02, secondaryDForward= 0.0006;
-    public static double pHeading=  0.2 , dHeading=0.002, secondaryPHeading= 0.1, secondaryDHeading= 0.001;
+    public static double pHeading=  0.4 , dHeading=0.004, secondaryPHeading= 0.1, secondaryDHeading= 0.001;
     public static boolean useSecondaryStrafe= true, useSecondaryForward= true, useSecondaryHeading= true;
     public static double strafeThreshold=3, forwardThreshold=3, headingThreshold= 0.1;
     public static PIDFController strafe= new PIDFController(0.01,0,0.00001,0);
@@ -20,7 +20,7 @@ public class Constants {
     public static PIDFController secondaryForward= new PIDFController(0.08,0,0.00001,0);
     public static PIDFController secondaryHeading= new PIDFController(2,0,0.15,0);
     public static double filterParameter = 0.8;
-    public static double xDeceleration = 6000* 25.4, yDeceleration = 6000 * 25.4;
+    public static double xDeceleration = 4000* 25.4, yDeceleration = 4000 * 25.4;
     public volatile static long threadUpdatePeriod= 1;
     public static double headingConstraint= 0.1;
     public static volatile double distanceConstraint= 3;

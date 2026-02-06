@@ -15,7 +15,7 @@ public class ShootCloseAuto implements Task {
     private final double increment= -0.015;
     private final double waitTime= 0.28;
     private final double waitTime2= 0.13;
-    private final double vel= 1800, pos= .7578;
+    private final double vel= 1600, pos= .7;
     ElapsedTime timer;
 
     public ShootCloseAuto(){
@@ -23,16 +23,16 @@ public class ShootCloseAuto implements Task {
 
         Turret.setState(Turret.State.AUTO);
         Turret.setDegrees(-90);
-        //                    Shooter.setVelocity(vel);
-        //                    Shooter.s.setPosition(pos);
+                            Shooter.setVelocity(vel);
+                            Shooter.s.setPosition(pos);
         // Turret.setTracking(true);
-        s.addTask(Intake::start)
+        s.addTask(()->{Intake.start();Shooter.shooting = true;})
                 .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(Shooter.vel))< Shooter.velocityThreshold || timer.seconds()> 2)
                 .addTask(Spindexer::shootRandom)
                 .waitSeconds(waitTime)
-                .addTask(()->Shooter.s.setPosition(Shooter.HoodPos+increment))
+                .addTask(()->Shooter.s.setPosition(pos+increment))
                 .waitSeconds(waitTime2)
-                .addTask(()->Shooter.s.setPosition(Shooter.HoodPos+coef* increment))
+                .addTask(()->Shooter.s.setPosition(pos+coef* increment))
                 .waitSeconds(0.5)
                 .addTask(Spindexer::turnBack)
                 .addTask(()->{
