@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Poses;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.logic.ShootCloseAuto;
@@ -13,8 +12,6 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexe
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
-import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalScheduler;
-import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalTask;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.ResetTurret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Chassis;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
@@ -23,9 +20,9 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @Autonomous(
-        group = "Auto",name="Close RED"
+        name = "Close BLUE putin diferit"
 )
-public class TestAuto extends BetterOpMode {
+public class AutoClosePutinDiferitAlbastru extends BetterOpMode {
     Robot r;
     Chassis c;
     Scheduler resetTurret;
@@ -33,17 +30,18 @@ public class TestAuto extends BetterOpMode {
         GATE, SPIKES;
     }
     TestAuto.Decision decision= TestAuto.Decision.SPIKES;
-    public class GateCycle implements Task{
+    public class GateCycle implements Task {
 
         private final Scheduler s;
         public GateCycle(){
             s= new Scheduler(c);
 
-            s.lineToConstantAsync(Poses.intermediateGateOpen, 10, Math.toRadians(30))
-                    .lineToConstantAsync(Poses.gateOpenPose, 1.5)
+            s.lineToConstantAsync(Poses.intermediateGateOpen.mirrorOnYAxis(), 10, Math.toRadians(30))
+                    .lineToConstantAsync(Poses.gateOpenPose.mirrorOnYAxis(), 1.7)
+                    .lineToConstantAsync(Poses.gateCollect.mirrorOnYAxis(), .5)
                     .waitSeconds(1.5)
-                    .lineToConstantAsync(Poses.intermediateGateOpen, .6)
-                    .lineToConstantAsync(Poses.closeShootPose, 2.5)
+                    .lineToConstantAsync(Poses.intermediateGateOpen.mirrorOnYAxis(), .6)
+                    .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(), 2.5)
                     .addTask(new ShootCloseAuto());
         }
 
@@ -59,8 +57,8 @@ public class TestAuto extends BetterOpMode {
         public ShootFirstSpikes(){
             s= new Scheduler(c);
             s
-                    .lineToConstantAsync(Poses.firstSpikesCollect,3)
-                    .lineToConstantAsync(Poses.closeShootPose,2.5)
+                    .lineToConstantAsync(Poses.firstSpikesCollect.mirrorOnYAxis(),3)
+                    .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(),2.5)
                     .addTask(new ShootCloseAuto());
         }
 
@@ -87,35 +85,35 @@ public class TestAuto extends BetterOpMode {
 
         Shooter.s.setPosition(.74);
         opModeScheduler.addChassis(c);
-        c.setStartingPosition(Poses.startPose);
+        c.setStartingPosition(Poses.startPose.mirrorOnYAxis());
         super.setSchedulerUpdateInInit(false);
         //c.setMaxPower(.5);
         opModeScheduler
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
-                    Turret.setDegrees(-90);
+                    Turret.setDegrees(90);
                     Shooter.setVelocity(2000);
                     Shooter.s.setPosition(.74);
                 })
-                .lineToConstantAsync(Poses.closeShootPose, 2.5)
+                .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(), 2.5)
                 .addTask(()->{
                     //Shooter.setVelocity(1630);
                 })
                 .addTask(new ShootCloseAuto())
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
-                    Turret.setDegrees(-90);
+                    Turret.setDegrees(90);
                     Shooter.setVelocity(1800);
                     Shooter.s.setPosition(.74);
                 })
-                .lineToConstantAsync(Poses.secondSpikes, 5, Math.toRadians(15))
-                .lineToConstantAsync(Poses.secondSpikesCollect, 8, Math.toRadians(30))
-                .lineToConstantAsync(Poses.secondSpikes, .8)
-                .lineToConstantAsync(Poses.closeShootPose,3)
+                .lineToConstantAsync(Poses.secondSpikes.mirrorOnYAxis(), 5, Math.toRadians(15))
+                .lineToConstantAsync(Poses.secondSpikesCollect.mirrorOnYAxis(), 8, Math.toRadians(30))
+                .lineToConstantAsync(Poses.secondSpikes.mirrorOnYAxis(), .8)
+                .lineToConstantAsync(Poses.closeShootPose.mirrorOnYAxis(),3)
                 .addTask(new ShootCloseAuto())
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
-                    Turret.setDegrees(-90);
+                    Turret.setDegrees(90);
                     Shooter.setVelocity(1800);
                     Shooter.s.setPosition(.74);
                 })
@@ -130,18 +128,18 @@ public class TestAuto extends BetterOpMode {
                 .addTask(new GateCycle())
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
-                    Turret.setDegrees(-90);
+                    Turret.setDegrees(90);
                     Shooter.setVelocity(1800);
                     Shooter.s.setPosition(.74);
                 })
                 .addTask(new ShootFirstSpikes())
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
-                    Turret.setDegrees(-90);
+                    Turret.setDegrees(90);
                     Shooter.setVelocity(1800);
                     Shooter.s.setPosition(.74);
                 })
-                .lineToConstantAsync(Poses.firstSpikesCollect,2);
+                .lineToConstantAsync(Poses.firstSpikesCollect.mirrorOnYAxis(),2);
 //                .addTask(new GateCycle())
 //                .addTask(new GateCycle())
 //                .addTask(new ConditionalTask(
@@ -170,7 +168,7 @@ public class TestAuto extends BetterOpMode {
         resetTurret.addTask(new ResetTurret(Turret.State.AUTO));
 
         initIndexer= new Scheduler()
-                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_1))
+                .addTask(()-> Spindexer.turnTo(Spindexer.Slots.SLOT_1))
                 .waitSeconds(2)
                 .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_2))
                 .waitSeconds(2)

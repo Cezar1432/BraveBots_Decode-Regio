@@ -205,6 +205,8 @@ public class Robot {
         }
     }
 
+    public static boolean shooting= false;
+
 
 
 

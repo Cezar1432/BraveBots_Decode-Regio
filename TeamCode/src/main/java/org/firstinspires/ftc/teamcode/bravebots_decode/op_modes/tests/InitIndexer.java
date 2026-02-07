@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @Autonomous(
+        group = "Auto",
         name = "de pus preload"
 )
 public class InitIndexer extends BetterOpMode {

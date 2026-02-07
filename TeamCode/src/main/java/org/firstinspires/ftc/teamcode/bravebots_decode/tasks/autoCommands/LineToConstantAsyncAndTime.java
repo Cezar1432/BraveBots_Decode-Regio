@@ -22,7 +22,7 @@ public class LineToConstantAsyncAndTime implements Task {
             c.lineToConstant(p);
             started= true;
         }
-        c.update();
+        //c.update();
         return c.finished(time);
     }
 }

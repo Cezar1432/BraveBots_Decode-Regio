@@ -20,7 +20,9 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.Sp
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.SwerveDrivetrain;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
-@TeleOp
+@TeleOp(
+        name = "TeleOP Red"
+)
 @Configurable
 public class ShooterCalibrationTeodor extends LinearOpMode {
     Robot r;
@@ -177,6 +179,7 @@ public class ShooterCalibrationTeodor extends LinearOpMode {
                 currentTask.addTask(new ShootFortaTunabil(velocity));
                 //nigg= true;
             }
+            Shooter.setCoefs();
             Shooter.s.setPosition(Shooter.s.getPosition()+ 0.0025*
                     (gamepadEx1.getDouble(BetterGamepad.Trigger.RIGHT_TRIGGER)- gamepadEx1.getDouble(BetterGamepad.Trigger.LEFT_TRIGGER)));
             now= System.nanoTime();

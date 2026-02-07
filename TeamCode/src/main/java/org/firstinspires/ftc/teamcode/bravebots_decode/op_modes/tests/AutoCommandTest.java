@@ -16,7 +16,9 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.drivetrains.Sw
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 
-@TeleOp(group = "Tests")
+@TeleOp(
+        name = "TeleOP Red2"
+)
 public class AutoCommandTest extends LinearOpMode {
     Robot robot;
     Chassis drive;

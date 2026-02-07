@@ -18,7 +18,9 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMoto
 import java.util.LinkedList;
 import java.util.List;
 
-@TeleOp
+@TeleOp(
+        name = "TeleOP Blue"
+)
 public class WHATTHEFUCK extends LinearOpMode {
 
     //    BetterMotorEx m;

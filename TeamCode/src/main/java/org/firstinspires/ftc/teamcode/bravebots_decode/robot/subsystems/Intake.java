@@ -14,6 +14,13 @@ public class Intake {
         motor.setPower(0);
         intaking= false;
     }
+    public static void reverse(){
+        motor.setPower(0.5);
+
+    }
+    public static void setPower(double power){
+        motor.setPower(power);
+    }
     public static void toggle(){
         if(!intaking){
             start();

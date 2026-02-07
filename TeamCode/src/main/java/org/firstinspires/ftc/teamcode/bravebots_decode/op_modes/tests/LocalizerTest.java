@@ -26,7 +26,9 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficien
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
-@TeleOp
+@TeleOp(
+        name = "TeleOP Red?"
+)
 @Configurable
 public class LocalizerTest extends BetterOpMode {
 

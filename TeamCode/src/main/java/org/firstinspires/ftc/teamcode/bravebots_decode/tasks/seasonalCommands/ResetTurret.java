@@ -20,7 +20,7 @@ public class ResetTurret implements Task {
             s= new Scheduler();
             s.addTask(()-> Turret.m.setPower(-.44))
                     .waitSeconds(.3)
-                    .addTask(()-> Math.abs(Turret.m.getVelocity())< 20)
+                    .addTask(()-> Math.abs(Turret.m.getVelocity())< 40)
                     .addTask(Turret::reset)
                     .addTask(()->
                     {

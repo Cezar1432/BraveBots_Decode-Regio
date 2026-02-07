@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Poses;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.logic.ShootCloseAuto;
@@ -13,8 +12,6 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexe
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
-import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalScheduler;
-import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.commandTypes.ConditionalTask;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.seasonalCommands.ResetTurret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Chassis;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.BetterOpMode;
@@ -23,9 +20,9 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @Autonomous(
-        group = "Auto",name="Close RED"
+        group = "Auto",name="Close RED putin diferit"
 )
-public class TestAuto extends BetterOpMode {
+public class AutoClosePutinDifertiaRosu extends BetterOpMode {
     Robot r;
     Chassis c;
     Scheduler resetTurret;
@@ -33,14 +30,15 @@ public class TestAuto extends BetterOpMode {
         GATE, SPIKES;
     }
     TestAuto.Decision decision= TestAuto.Decision.SPIKES;
-    public class GateCycle implements Task{
+    public class GateCycle implements Task {
 
         private final Scheduler s;
         public GateCycle(){
             s= new Scheduler(c);
 
             s.lineToConstantAsync(Poses.intermediateGateOpen, 10, Math.toRadians(30))
-                    .lineToConstantAsync(Poses.gateOpenPose, 1.5)
+                    .lineToConstantAsync(Poses.gateOpenPose, 1.7)
+                    .lineToConstantAsync(Poses.gateCollect, .5)
                     .waitSeconds(1.5)
                     .lineToConstantAsync(Poses.intermediateGateOpen, .6)
                     .lineToConstantAsync(Poses.closeShootPose, 2.5)
@@ -170,7 +168,7 @@ public class TestAuto extends BetterOpMode {
         resetTurret.addTask(new ResetTurret(Turret.State.AUTO));
 
         initIndexer= new Scheduler()
-                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_1))
+                .addTask(()-> Spindexer.turnTo(Spindexer.Slots.SLOT_1))
                 .waitSeconds(2)
                 .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_2))
                 .waitSeconds(2)

@@ -313,77 +313,85 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
 
 
-        if(trackWidth== 0)
-            throw new IllegalArgumentException("Track Width nesetat");
-        if(wheelBase== 0)
-            throw new IllegalArgumentException("Wheel Base nesetat");
-        double rotation= limiter.getRightX();
-        double strafeX= limiter.getLeftX();
-        double strafeY= limiter.getLeftY();
-        if(Math.abs(strafeX) > 0.02 || Math.abs(strafeY)> 0.02 || Math.abs(rotation)> 0.02) {
-            radius= hypot(wheelBase, trackWidth);
-            if(Math.abs(rotation)< .2 && !headingLock){
-                headingLock= true;
-                lastAngle = robot.robotHeading;
+
+            if (trackWidth == 0)
+                throw new IllegalArgumentException("Track Width nesetat");
+            if (wheelBase == 0)
+                throw new IllegalArgumentException("Wheel Base nesetat");
+            double rotation = limiter.getRightX();
+            double strafeX = limiter.getLeftX();
+            double strafeY = limiter.getLeftY();
+            if (Math.abs(strafeX) > 0.02 || Math.abs(strafeY) > 0.02 || Math.abs(rotation) > 0.02) {
+                radius = hypot(wheelBase, trackWidth);
+                if (Math.abs(rotation) < .2 && !headingLock) {
+                    headingLock = true;
+                    lastAngle = robot.robotHeading;
+                } else if (Math.abs(rotation) > .2) {
+                    headingLock = false;
+                }
+
+                if (headingLock) {
+                    double err = MathStuff.normalizeDegrees(robot.robotHeading - lastAngle);
+                    headingCorrection = headingController.calculate(0, err);
+                }
+
+                rotation = headingLock ? -headingCorrection : -rotation;
+
+                if (Math.abs(rotation) < .135)
+                    rotation = 0;
+
+                double a = strafeX + rotation * (wheelBase / radius),
+                        b = strafeX - rotation * (wheelBase / radius),
+                        c = strafeY + rotation * (trackWidth / radius),
+                        d = strafeY - rotation * (trackWidth / radius);
+
+
+                double flSpeed = hypot(b, c),
+                        frSpeed = hypot(b, d),
+                        brSpeed = hypot(a, d),
+                        blSpeed = hypot(a, c);
+                double flAngle = atan2(b, c),
+                        frAngle = atan2(b, d),
+                        brAngle = atan2(a, d),
+                        blAngle = atan2(a, c);
+
+                double max = Math.max(Math.max(flSpeed, frSpeed), Math.max(brSpeed, blSpeed));
+                if (max > 1) {
+                    flSpeed /= max;
+                    frSpeed /= max;
+                    blSpeed /= max;
+                    brSpeed /= max;
+                }
+
+                fl.setState(-flSpeed, toDegrees(flAngle));
+                fr.setState(frSpeed, toDegrees(frAngle));
+                bl.setState(-brSpeed, toDegrees(blAngle));
+                br.setState(blSpeed, toDegrees(brAngle));
+
+                lastFLangle = flAngle;
+                lastFRangle = frAngle;
+                lastBLangle = blAngle;
+                lastBRangle = brAngle;
             }
-            else if(Math.abs(rotation)> .2){
-                headingLock= false;
+
+            else if(Robot.shooting){
+                fl.setState(0, 45);
+                fr.setState(0, -45);
+                bl.setState(0, -45);
+                br.setState(0, 45);
             }
-
-            if(headingLock){
-                double err= MathStuff.normalizeDegrees(robot.robotHeading- lastAngle);
-                headingCorrection= headingController.calculate(0, err);
+            else {
+                fl.setState(0, toDegrees(lastFLangle));
+                fr.setState(0, toDegrees(lastFRangle));
+                bl.setState(0, toDegrees(lastBLangle));
+                br.setState(0, toDegrees(lastBRangle));
             }
-
-            rotation= headingLock ? -headingCorrection : -rotation;
-
-            if(Math.abs(rotation)< .135)
-                rotation= 0;
-
-            double a = strafeX + rotation * (wheelBase / radius),
-                    b = strafeX - rotation * (wheelBase / radius),
-                    c = strafeY + rotation * (trackWidth / radius),
-                    d = strafeY - rotation * (trackWidth / radius);
-
-
-            double flSpeed = hypot(b, c),
-                    frSpeed = hypot(b, d),
-                    brSpeed = hypot(a, d),
-                    blSpeed = hypot(a, c);
-            double flAngle = atan2(b, c),
-                    frAngle = atan2(b, d),
-                    brAngle = atan2(a, d),
-                    blAngle = atan2(a, c);
-
-            double max = Math.max(Math.max(flSpeed, frSpeed), Math.max(brSpeed, blSpeed));
-            if (max > 1) {
-                flSpeed /= max;
-                frSpeed /= max;
-                blSpeed /= max;
-                brSpeed /= max;
-            }
-
-            fl.setState(-flSpeed, toDegrees(flAngle));
-            fr.setState(frSpeed, toDegrees(frAngle));
-            bl.setState(-brSpeed, toDegrees(blAngle));
-            br. setState(blSpeed, toDegrees(brAngle));
-
-            lastFLangle = flAngle;
-            lastFRangle = frAngle;
-            lastBLangle = blAngle;
-            lastBRangle = brAngle;
         }
 
-        else{
-            fl.setState(0, toDegrees(lastFLangle));
-            fr.setState(0, toDegrees(lastFRangle));
-            bl.setState(0, toDegrees(lastBLangle));
-            br.setState(0, toDegrees(lastBRangle));
-        }
 
 
 
-    }
+
 
     public void write(){
         if(timer== null)
@@ -422,10 +430,11 @@ public class SwerveDrivetrain implements DrivetrainInterface {
     @Override
     public void updateAuto(double strafeX, double strafeY, double rotation) {
 
-        if(trackWidth== 0)
-            throw new IllegalArgumentException("Track WIdth nesetat");
-        if(wheelBase==0 )
-            throw new IllegalArgumentException("Wheel Base nesetat");
+
+            if (trackWidth == 0)
+                throw new IllegalArgumentException("Track WIdth nesetat");
+            if (wheelBase == 0)
+                throw new IllegalArgumentException("Wheel Base nesetat");
 //         Calculate wheel vectors
 //         For rotation: each wheel moves perpendicular to its position vector
 //         FL is at (-trackWidth/2, wheelBase/2), rotation adds (wheelBase/2, trackWidth/2) to velocity
@@ -434,61 +443,61 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 //         BR is at (trackWidth/2, -wheelBase/2), rotation adds (-wheelBase/2, -trackWidth/2) to velocity
 //        double smth= Math.sqrt(strafeX* strafeX + strafeY * strafeY);
 //        double smth2= -.5 * smth+ .75;
-        radius= hypot(trackWidth, wheelBase);
-        //rotation= rotation* smth2;
+            radius = hypot(trackWidth, wheelBase);
+            //rotation= rotation* smth2;
 
-        if(Math.abs(strafeX) > 0.01 || Math.abs(strafeY)> 0.01 || Math.abs(rotation)> 0.01) {
-            strafeX*=-1;
-            rotation *= -1.1;
-            double rawMax= Math.max(Math.abs(strafeX), Math.max(Math.abs(strafeY), Math.abs(rotation)));
-            rawMax= Math.abs(rawMax);
-            strafeX/=rawMax;
-            strafeY/=rawMax;
-            rotation/=rawMax;
+            if (Math.abs(strafeX) > 0.01 || Math.abs(strafeY) > 0.01 || Math.abs(rotation) > 0.01) {
+                strafeX *= -1;
+                rotation *= -1.1;
+                double rawMax = Math.max(Math.abs(strafeX), Math.max(Math.abs(strafeY), Math.abs(rotation)));
+                rawMax = Math.abs(rawMax);
+                strafeX /= rawMax;
+                strafeY /= rawMax;
+                rotation /= rawMax;
 //            strafeX *= -1;
 //            strafeY*= -1;
-            double a = strafeX + rotation * (wheelBase / radius),
-                    b = strafeX - rotation * (wheelBase / radius),
-                    c = strafeY + rotation * (trackWidth / radius),
-                    d = strafeY - rotation * (trackWidth / radius);
+                double a = strafeX + rotation * (wheelBase / radius),
+                        b = strafeX - rotation * (wheelBase / radius),
+                        c = strafeY + rotation * (trackWidth / radius),
+                        d = strafeY - rotation * (trackWidth / radius);
 
 
-            double flSpeed = hypot(b, c),
-                    frSpeed = hypot(b, d),
-                    brSpeed = hypot(a, d),
-                    blSpeed = hypot(a, c);
-            double flAngle = atan2(b, c),
-                    frAngle = atan2(b, d),
-                    brAngle = atan2(a, d),
-                    blAngle = atan2(a, c);
+                double flSpeed = hypot(b, c),
+                        frSpeed = hypot(b, d),
+                        brSpeed = hypot(a, d),
+                        blSpeed = hypot(a, c);
+                double flAngle = atan2(b, c),
+                        frAngle = atan2(b, d),
+                        brAngle = atan2(a, d),
+                        blAngle = atan2(a, c);
 
-            double max = Math.max(Math.max(flSpeed, frSpeed), Math.max(brSpeed, blSpeed));
-            if (max > 1) {
-                flSpeed /= max;
-                frSpeed /= max;
-                blSpeed /= max;
-                brSpeed /= max;
+                double max = Math.max(Math.max(flSpeed, frSpeed), Math.max(brSpeed, blSpeed));
+                if (max > 1) {
+                    flSpeed /= max;
+                    frSpeed /= max;
+                    blSpeed /= max;
+                    brSpeed /= max;
+                }
+
+                fl.setState(flSpeed, toDegrees(flAngle));
+                fr.setState(-frSpeed, toDegrees(frAngle));
+                bl.setState(brSpeed, toDegrees(blAngle));
+                br.setState(-blSpeed, toDegrees(brAngle));
+
+                lastFLangle = flAngle;
+                lastFRangle = frAngle;
+                lastBLangle = blAngle;
+                lastBRangle = brAngle;
+                ok = true;
+            } else {
+                fl.setState(0, toDegrees(lastFLangle));
+                fr.setState(0, toDegrees(lastFRangle));
+                bl.setState(0, toDegrees(lastBLangle));
+                br.setState(0, toDegrees(lastBRangle));
+                ok = false;
             }
 
-            fl.setState(flSpeed, toDegrees(flAngle));
-            fr.setState(-frSpeed, toDegrees(frAngle));
-            bl.setState(brSpeed, toDegrees(blAngle));
-            br.setState(-blSpeed, toDegrees(brAngle));
 
-            lastFLangle = flAngle;
-            lastFRangle = frAngle;
-            lastBLangle = blAngle;
-            lastBRangle = brAngle;
-            ok= true;
-        }
-
-        else{
-            fl.setState(0, toDegrees(lastFLangle));
-            fr.setState(0, toDegrees(lastFRangle));
-            bl.setState(0, toDegrees(lastBLangle));
-            br.setState(0, toDegrees(lastBRangle));
-            ok= false;
-        }
 
 
 

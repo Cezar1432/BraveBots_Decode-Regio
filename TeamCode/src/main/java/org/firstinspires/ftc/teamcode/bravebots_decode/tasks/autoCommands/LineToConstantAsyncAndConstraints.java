@@ -23,7 +23,7 @@ public class LineToConstantAsyncAndConstraints implements Task {
             c.lineToConstant(p);
             started= true;
         }
-        c.update();
+        //c.update();
         return c.finished(dist, rad);
     }
 }

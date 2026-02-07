@@ -24,11 +24,12 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficien
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterGamepad;
 
 @TeleOp(
-        group = "TeleOP",name = "Telop BLUE"
+        group = "TeleOP",name = "TeleOP RED.."
 )
-@Deprecated
+
 @Configurable
-public class TestOpMode extends BetterOpMode {
+@Deprecated
+public class TeleOpRed extends BetterOpMode {
     Robot robot;
     public SwerveDrivetrain drive;
     Thread thread2;
@@ -37,7 +38,7 @@ public class TestOpMode extends BetterOpMode {
     volatile double  now3, last3;
     @Override
     public void initialize() {
-        robot= new Robot(hardwareMap, telemetry, Alliance.BLUE);
+        robot= new Robot(hardwareMap, telemetry, Alliance.RED);
         robot.initialize();
         drive= new SwerveDrivetrain(robot).setWheelBase(Constants.wheelBase)
                 .setTrackWidth(Constants.trackWidth)
@@ -58,9 +59,9 @@ public class TestOpMode extends BetterOpMode {
             Robot.odo.setHeading(90, AngleUnit.DEGREES);
         });
         gamepadEx1.getButton(BetterGamepad.Buttons.LEFT_BUMPER)
-                        .whenPressed(()-> Turret.setState(Turret.State.TRACKING));
+                .whenPressed(()-> Turret.setState(Turret.State.TRACKING));
         gamepadEx1.getButton(BetterGamepad.Buttons.DPAD_DOWN)
-                        .whenPressed(()-> Turret.setState(Turret.State.STATIC));
+                .whenPressed(()-> Turret.setState(Turret.State.STATIC));
         gamepadEx1.getButton(BetterGamepad.Buttons.OPTIONS)
                 .whenPressed(()->{
                     opModeScheduler.removeAllTasks();
@@ -121,21 +122,19 @@ public class TestOpMode extends BetterOpMode {
             opModeScheduler.addTask(new Spit());
 
         now= System.nanoTime();
-
-        telemetry.addData("tracking", Turret.tracking);
-//        telemetry.addData("hz", 1e9/(now- last));
-//        //telemetry.addData("hz2", hz);
-//        telemetry.addData("hz3", hz2);
-//        telemetry.addData("turret state", Turret.getState());
-////        telemetry.addData("heading", robot.robotHeading);
-//        telemetry.addData("x", Turret.x);
-//        telemetry.addData("y", Turret.y);
-//        telemetry.addData("turret angle", Turret.getAngle());
-//        telemetry.addData("targetticks",Turret.targetTicks);
-//        telemetry.addData("pos",Turret.getTicks()-Turret.ticksPerRevolution/2);
-//        telemetry.addData("heading", LimelightMath.robotHeading);
-//        telemetry.addData("shooting", Robot.shooting);
-//        telemetry.update();
+        telemetry.addData("hz", 1e9/(now- last));
+        //telemetry.addData("hz2", hz);
+        telemetry.addData("hz3", hz2);
+        telemetry.addData("turret state", Turret.getState());
+//        telemetry.addData("heading", robot.robotHeading);
+        telemetry.addData("x", Turret.x);
+        telemetry.addData("y", Turret.y);
+        telemetry.addData("turret angle", Turret.getAngle());
+        telemetry.addData("targetticks",Turret.targetTicks);
+        telemetry.addData("pos",Turret.getTicks()-Turret.ticksPerRevolution/2);
+        telemetry.addData("heading", LimelightMath.robotHeading);
+        telemetry.addData("shooting", Robot.shooting);
+        telemetry.update();
         last= now;
         robot.update();
         drive.write();

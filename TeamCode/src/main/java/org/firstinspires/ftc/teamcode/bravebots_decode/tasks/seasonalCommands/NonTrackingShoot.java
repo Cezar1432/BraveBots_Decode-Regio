@@ -8,13 +8,13 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Task;
 
-public class Shoot implements Task {
+public class NonTrackingShoot implements Task {
     private final Scheduler s;
     private final double coef = 2;
     private final double increment= -0.015;
     private final double waitTime= 0.28;
     private final double waitTime2= 0.13;
-    public Shoot(){
+    public NonTrackingShoot(){
         s= new Scheduler();
 
         s.addTask(()-> {
@@ -24,7 +24,7 @@ public class Shoot implements Task {
                     Intake.start();
                     //Turret.setState(Turret.State.TRACKING);
                 })
-                .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(Shooter.vel))< Shooter.velocityThreshold)
+                .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(1700))< Shooter.velocityThreshold)
                 .addTask(Spindexer::shootRandom)
                 .waitSeconds(waitTime)
                 .addTask(()->Shooter.s.setPosition(Shooter.HoodPos+increment))
@@ -42,11 +42,11 @@ public class Shoot implements Task {
 
     @Override
     public boolean Run() {
-        Shooter.update();
-        Shooter.write();
-//        Shooter.motor1.setVelocity(1700);
-//        Shooter.motor2.setVelocity(1700);
-//        Shooter.s.setPosition(.75);
+//        Shooter.update();
+//        Shooter.write();
+        Shooter.motor1.setVelocity(-1700);
+        Shooter.motor2.setVelocity(-1700);
+        Shooter.s.setPosition(.75);
         s.update();
         return s.done();
     }

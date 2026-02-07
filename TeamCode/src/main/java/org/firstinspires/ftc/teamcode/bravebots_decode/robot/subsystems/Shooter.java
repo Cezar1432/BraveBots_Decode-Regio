@@ -25,7 +25,9 @@ public class Shooter {
     public static double velocityThreshold= 50;
     public static DcMotorEx motor1, motor2;
     //public static double p = 20, i, d, f = 15;
-    public static final double p= 30, i=0, d=0, f= 20;
+    public static double p= 10, i=0, d=0, f= 15;
+    public static double pclose=30 , iclose=0, dclose=0, fclose=20;
+    public static double pfar=60 , ifar = 0, dfar = 0, ffar= 40;
     public static EvenBetterServo s;
     public static boolean velocitystop = false,shooting = false;
     public static double hoodincrement= 0.045,shootTime=0.12,coefNiggaMan=1.3,waitForNigga=3, hoodtunabil = 0;
@@ -64,6 +66,18 @@ public class Shooter {
         shootercoeffs= new PIDFCoefficients(p,i,d,f);
         motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(p,i,d,f));
         motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,new PIDFCoefficients(p,i,d,f));
+    }
+    public static void setCoefs(PIDFCoefficients coefs)
+    {
+        motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,coefs);
+        motor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER ,coefs);
+    }
+    public static void setPower(double power)
+    {
+        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor1.setPower(-power);
+        motor2.setPower(-power);
     }
     public static boolean wereCoeffsSet = false;
     public static void setVelocity(double vel){

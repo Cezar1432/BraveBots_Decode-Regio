@@ -37,7 +37,7 @@ public class Turret {
     //public static double p = 0.02, d = 0.0006, i = 0.05, f = 0, st = 0, s = 0,p2=0,d2=0,i2=0,f2=0;
     //public static double p = 0.009, d = 0.0007, i = 0, f = 0, st = 0, s = 0.065,p2=0.03,d2=0.00004,i2=0,f2=0;
     //public static double p = 0.01, d = 0.0002, i = 0, f = 0, st = 0, s = 0.055,p2=0.02,d2=0.0001,i2=0,f2=0;
-    public static double p = 0.00012, d = 0.000003, i = 0.02, f = 0, st = 0, s = 0.055,p2=0.0115,d2=0.0001,i2=0,f2=0;
+    public static double /*p = 0.00012, d = 0.000003, i = 0.02,*/p=0.0003,d=0.0000015,i=0.05, f = 0, st = 0, s = 0.055,p2=0.0115,d2=0.0001,i2=0,f2=0;
     private static double  lastAngle;
     public static double GEAR_RATIO= 1.05;
     public static double CAMERA_RESOLUTION= 640;
