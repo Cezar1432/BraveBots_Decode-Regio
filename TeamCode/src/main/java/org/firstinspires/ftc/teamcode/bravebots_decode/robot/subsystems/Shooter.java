@@ -95,8 +95,7 @@ public class Shooter {
         motor1.close();
         //shooter1.setPower(0);
         //shooter2.setPower(0);
-
-    }
+        }
 
 
     public static double speed,theta;

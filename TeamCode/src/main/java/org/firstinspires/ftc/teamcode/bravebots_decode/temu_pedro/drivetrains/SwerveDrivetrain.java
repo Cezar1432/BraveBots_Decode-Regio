@@ -95,6 +95,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         return this;
     }
 
+    @Deprecated
     public class ModuleFinalOutput{
         public double motorPower, servoPower;
         public void setMotorPower(double power)

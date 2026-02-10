@@ -134,8 +134,10 @@ public class TestOpMode extends BetterOpMode {
 //        telemetry.addData("targetticks",Turret.targetTicks);
 //        telemetry.addData("pos",Turret.getTicks()-Turret.ticksPerRevolution/2);
 //        telemetry.addData("heading", LimelightMath.robotHeading);
-//        telemetry.addData("shooting", Robot.shooting);
-//        telemetry.update();
+//        telemetry.addData("shooting", Robot.shooting);#
+        telemetry.addData("dist", Spindexer.colorSensor.getDistanceInCM());
+        telemetry.addData("slot", Spindexer.currentSlot);
+        telemetry.update();
         last= now;
         robot.update();
         drive.write();

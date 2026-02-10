@@ -21,7 +21,8 @@ public class Poses {
          public static Pose humanPlayerCollect= new Pose(135.26, 10,Math.toRadians(0));
          public static Pose farLeave= new Pose(106.15, 11.59,Math.toRadians(0));
 
-         public static Pose humanPlayer2= new Pose(132.87, 12.941, Math.toRadians(20));
+        // public static Pose humanPlayer2= new Pose(135.87, 12.941, Math.toRadians(20));
+        public static Pose humanPlayer2= humanPlayerCollect;
          public static Pose farShootPose= new Pose(84.42003110419908, 12.716827371695189, Math.toRadians(0));
 
          public static Pose gateCollect= new Pose(130.7993779160187, 50.48367029548996, Math.toRadians(60));

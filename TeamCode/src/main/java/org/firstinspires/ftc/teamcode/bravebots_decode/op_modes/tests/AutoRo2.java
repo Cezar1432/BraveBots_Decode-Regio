@@ -33,9 +33,12 @@ public class AutoRo2 extends BetterOpMode {
         public HumanPlayerCycle(Pose pose){
             s= new Scheduler(c)
                     .addTask(Intake::start)
+                    .addTask(()->c.setMaxPower(.7))
                     .lineToConstantAsync(pose, 3)
-                    .lineToConstantAsync(new Pose(pose.x+10, pose.y, pose.getTheta()),1.8)
+
+                    .lineToConstantAsync(new Pose(pose.x-10, pose.y, pose.getTheta()),1.8)
                     .lineToConstantAsync(pose, 2.5)
+                    .addTask(()-> c.setMaxPower(1))
                     //.waitSeconds(1.6)
                     .lineToConstantAsync(Poses.farShootPose,3)
                     .addTask(new ShootFarAuto(2, Alliance.RED));
@@ -67,7 +70,7 @@ public class AutoRo2 extends BetterOpMode {
         opModeScheduler
                 .addTask(()->{
                     Turret.setState(Turret.State.AUTO);
-                    Turret.setDegrees(-110);
+                    Turret.setDegrees(-108);
                     Shooter.setVelocity(2500);
                     Shooter.s.setPosition(.77);
                     //.79 2080

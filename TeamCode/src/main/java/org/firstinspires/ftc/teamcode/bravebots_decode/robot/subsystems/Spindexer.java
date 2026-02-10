@@ -13,7 +13,7 @@ public class Spindexer{
 
      public static void setPosition(double pos){
          s1.setPosition(pos);
-         s2.setPosition(1- pos);
+         s2.setPosition(pos);
      }
      public static void shootRandom(){
 //         s1.setMaxDegrees(1100);
@@ -24,6 +24,7 @@ public class Spindexer{
 
      public enum Slots{
          SLOT_1(0.4656,0), SLOT_2(.345,0), SLOT_3(.2217,0),EJECT1(0.38,0),EJECT2(0.5117,0),EJECT3(0.6233,0);
+      // SLOT_1(0.4656,0), SLOT_2(.345,0), SLOT_3(.2217,0),EJECT1(0.38,0),EJECT2(0.5117,0),EJECT3(0.6233,0);
 
          final double frontPose, shootPose;
         // final double shootPose;

@@ -32,6 +32,10 @@ public class Shoot implements Task {
                 .addTask(()->Shooter.s.setPosition(Shooter.HoodPos+coef* increment))
                 .waitSeconds(0.5)
                 .addTask(Spindexer::turnBack)
+                .waitSeconds(.2)
+                .addTask(Spindexer::turnBack)
+                .waitSeconds(.1)
+                .addTask(()->Spindexer.turnTo(Spindexer.Slots.SLOT_1))
                 .addTask(()->{
                     Shooter.shooting = false;
                     Robot.shooting= false;
