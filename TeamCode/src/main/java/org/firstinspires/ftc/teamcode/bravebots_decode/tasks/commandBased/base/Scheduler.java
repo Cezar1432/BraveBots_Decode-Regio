@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base;
 
-import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveDriveKinematics;
+import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.SwerveDriveKinematics;
 
 
 import org.firstinspires.ftc.robotcore.external.Consumer;

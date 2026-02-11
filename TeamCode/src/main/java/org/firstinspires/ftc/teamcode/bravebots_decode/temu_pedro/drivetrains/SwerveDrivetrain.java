@@ -4,10 +4,12 @@ import static java.lang.Math.atan2;
 import static java.lang.Math.hypot;
 import static java.lang.Math.toDegrees;
 
-import com.arcrobotics.ftclib.controller.PIDFController;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
+import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.SwerveModuleState;
 
 import org.firstinspires.ftc.robotcore.external.Consumer;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -28,8 +30,8 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
     BetterCRServo sFL, sFR, sBL, sBR;
     BetterMotor mFL, mFR, mBL, mBR;
-
     public SwerveModule fl, fr, bl, br;
+
 
     Robot robot;
     boolean headingLock;

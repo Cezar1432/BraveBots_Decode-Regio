@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems;
 
 import static org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret.FIELD_LENGTH;
 
-import com.arcrobotics.ftclib.controller.PIDFController;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

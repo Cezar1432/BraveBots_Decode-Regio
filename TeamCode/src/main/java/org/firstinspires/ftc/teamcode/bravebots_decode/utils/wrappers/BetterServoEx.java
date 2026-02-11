@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers;
 
 import androidx.annotation.NonNull;
 
-import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.seattlesolvers.solverslib.hardware.ServoEx;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;

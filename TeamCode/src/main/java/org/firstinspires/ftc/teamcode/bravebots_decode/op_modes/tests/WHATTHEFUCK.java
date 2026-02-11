@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.tests;
 
-import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveDriveKinematics;
-import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveModuleState;
+import com.seattlesolvers.solverslib.geometry.Rotation2d;
+import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.SwerveDriveKinematics;
+import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.SwerveModuleState;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;

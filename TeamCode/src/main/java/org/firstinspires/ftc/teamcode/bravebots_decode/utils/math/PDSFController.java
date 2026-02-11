@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.utils.math;
 
 
-import com.arcrobotics.ftclib.controller.PIDFController;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 
 public class PDSFController extends PIDFController {
     public double kS= 0;
