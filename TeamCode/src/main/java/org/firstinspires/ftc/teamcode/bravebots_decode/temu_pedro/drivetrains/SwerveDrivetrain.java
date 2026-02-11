@@ -5,6 +5,7 @@ import static java.lang.Math.hypot;
 import static java.lang.Math.toDegrees;
 
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -23,6 +24,7 @@ import org.opencv.core.Mat;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+@Configurable
 
 public class SwerveDrivetrain implements DrivetrainInterface {
 
@@ -80,6 +82,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
     }
 
+    public static double leftFrontOffset= -15, rightFrontOffset= -5, leftBackOffset = -5, rightBackOffset= -8;
     private double wheelBase = 0;
     private double trackWidth = 0;
     //private  double r = Math.sqrt((wheelBase * wheelBase) + (trackWidth * trackWidth));
@@ -146,7 +149,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
 
             double alignmentFactor=  1 - Math.abs(diff)/90;
 //            //alignmentFactor= Math.min(1.5 * alignmentFactor, 1);
-            speed*= alignmentFactor;
+            //speed*= alignmentFactor;
             //driveMotor.setPower(speed * alignmentFactor);
             this.targetSpeed= speed;
         }
@@ -239,10 +242,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                             brSpeed /= max;
                         }
 
-                        fl.setState(flSpeed, toDegrees(flAngle));
-                        fr.setState(frSpeed, toDegrees(frAngle));
-                        bl.setState(brSpeed, toDegrees(blAngle));
-                        br.setState(blSpeed, toDegrees(brAngle));
+                        flAngle= MathStuff.normalizeDegrees(toDegrees(flAngle)- leftFrontOffset);
+                        frAngle= MathStuff.normalizeDegrees(toDegrees(frAngle)- rightFrontOffset);
+                        blAngle= MathStuff.normalizeDegrees(toDegrees(blAngle)- leftBackOffset);
+                        brAngle= MathStuff.normalizeDegrees(toDegrees(brAngle)- rightBackOffset);
+
+
+                        fl.setState(flSpeed, flAngle);
+                        fr.setState(frSpeed, frAngle);
+                        bl.setState(brSpeed, blAngle);
+                        br.setState(blSpeed, brAngle);
 
                         lastFLangle = frAngle;
                         lastFRangle = flAngle;
@@ -319,9 +328,9 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                 throw new IllegalArgumentException("Track Width nesetat");
             if (wheelBase == 0)
                 throw new IllegalArgumentException("Wheel Base nesetat");
-            double rotation = limiter.getRightX();
-            double strafeX = limiter.getLeftX();
-            double strafeY = limiter.getLeftY();
+            double rotation = Math.pow(rightX.getAsDouble(), 3);
+            double strafeX = Math.pow(leftX.getAsDouble() , 3);
+            double strafeY = Math.pow(leftY.getAsDouble(), 3);
             if (Math.abs(strafeX) > 0.02 || Math.abs(strafeY) > 0.02 || Math.abs(rotation) > 0.02) {
                 radius = hypot(wheelBase, trackWidth);
                 if (Math.abs(rotation) < .2 && !headingLock) {
@@ -364,10 +373,16 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                     brSpeed /= max;
                 }
 
-                fl.setState(-flSpeed, toDegrees(flAngle));
-                fr.setState(frSpeed, toDegrees(frAngle));
-                bl.setState(-brSpeed, toDegrees(blAngle));
-                br.setState(blSpeed, toDegrees(brAngle));
+                flAngle= MathStuff.normalizeDegrees(toDegrees(flAngle)- leftFrontOffset);
+                frAngle= MathStuff.normalizeDegrees(toDegrees(frAngle)- rightFrontOffset);
+                blAngle= MathStuff.normalizeDegrees(toDegrees(blAngle)- leftBackOffset);
+                brAngle= MathStuff.normalizeDegrees(toDegrees(brAngle)- rightBackOffset);
+
+
+                fl.setState(-flSpeed, flAngle);
+                fr.setState(frSpeed, frAngle);
+                bl.setState(-brSpeed, blAngle);
+                br.setState(blSpeed, brAngle);
 
                 lastFLangle = flAngle;
                 lastFRangle = frAngle;
