@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.T
 
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -17,7 +18,6 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.T
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.ShooterConstants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
-import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Vector;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetterServo;
 
 @Configurable
@@ -36,7 +36,7 @@ public class Shooter {
     public static final double g= 9.81;
     public static double hoodangle = 0;
     public static double rpm, pos, testingrpm, ballvelocity = 0,vel;
-    public static Vector robotmovementvector=new Vector(0,0);
+    //public static Vector robotmovementvector=new Vector(0,0);
 
 
     public static double rpmThreshhold = 400;
@@ -87,8 +87,13 @@ public class Shooter {
             setCoefs();
         }
         Shooter.vel = vel;
-        motor1.setVelocity(-vel);
-        motor2.setVelocity(-vel);
+        try {
+            motor1.setVelocity(-vel);
+            motor2.setVelocity(-vel);
+        }
+        catch (TargetPositionNotSetException ignored){
+
+        }
     }
     public static void stop() {
         velocitystop = true;
@@ -110,7 +115,7 @@ public class Shooter {
 
         speed = Math.hypot(vx, vy);
         theta = Math.atan2(vy, vx);
-        robotmovementvector = new Vector(speed, theta);
+        //robotmovementvector = new Vector(speed, theta);
     }
 
 
@@ -191,7 +196,7 @@ public class Shooter {
 
     public static double coordinateTheta,parralelvelocity,launchVelocityForY,newXVelocity,compensatedVelocitY, turretOffset;
     public static double distt, tangentialvelocity = 0, time;
-    public static Vector robotVelocity= new Vector(0,0);
+    //public static Vector robotVelocity= new Vector(0,0);
     public static final double a1 = -0.0641147, b1 = 0.390703, c1 = 0.18375;
     public static final double a2 = -100.04613, b2 = 804.30749, c2 = 357.66532;
     public static double inc=1;
@@ -204,13 +209,13 @@ public class Shooter {
         hoodangle = MathStuff.clamp(Math.atan(2 * y / x - Math.tan(a)), ShooterConstants.HOOD_MIN_ANGLE, ShooterConstants.HOOD_MAX_ANGLE);//initial angle
         ballvelocity = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodangle), 2) * (x * Math.tan(hoodangle) - y)));
 
-        robotVelocity = new Vector(robotmovementvector.getMagnitude(), robotheading);
+        //robotVelocity = new Vector(robotmovementvector.getMagnitude(), robotheading);
 
 
-        coordinateTheta =robotVelocity.getTheta() - robotmovementvector.getTheta();
+        //coordinateTheta =robotVelocity.getTheta() - robotmovementvector.getTheta();
 
-        parralelvelocity = Math.cos(coordinateTheta) *robotmovementvector.getMagnitude();
-        tangentialvelocity = Math.sin(coordinateTheta) *robotmovementvector.getMagnitude();
+       // parralelvelocity = Math.cos(coordinateTheta) *robotmovementvector.getMagnitude();
+        //tangentialvelocity = Math.sin(coordinateTheta) *robotmovementvector.getMagnitude();
 
         time = x /( ballvelocity * Math.cos(hoodangle));
         launchVelocityForY = ballvelocity * Math.sin(hoodangle);

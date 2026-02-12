@@ -27,6 +27,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Spindexe
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterColorSensor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
@@ -139,7 +140,7 @@ public class Robot {
     public void initializeRest(){
         //odo= hm.get(GoBildaPinpointDriver.class, "nigg");
         odo= hm.get(LazyPinpoint.class, "nigg");
-        odo.setFreq(200);
+        odo.setFreq(100);
         odo.setOffsets(Constants.xOffset, Constants.yOffset, DistanceUnit.CM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -192,19 +193,22 @@ public class Robot {
 
 
 
-        if(opModeType== OpModeType.TELEOP)
-            odo.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
-
-        robotHeading = odo.getHeading(AngleUnit.DEGREES);
+//        if(opModeType== OpModeType.TELEOP)
+//            odo.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
+//
+//        robotHeading = odo.getHeading(AngleUnit.DEGREES);
 
         // odo.update();
 
-        if(Turret.getState()== Turret.State.TRACKING) {
-            updatedHeading = LimelightMath.getLimelightUpdateAngle();
-            ll.updateRobotOrientation(updatedHeading);
+        if(opModeType== OpModeType.TELEOP) {
+            odo.update();
+            robotPose= new Pose(odo.getPosX(DistanceUnit.METER), odo.getPosY(DistanceUnit.METER), odo.getHeading(AngleUnit.RADIANS));
         }
+
+
     }
 
+    public static Pose robotPose;
     public static boolean shooting= false;
 
 

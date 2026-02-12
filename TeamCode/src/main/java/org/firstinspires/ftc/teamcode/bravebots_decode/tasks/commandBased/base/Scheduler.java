@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base;
 
-import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveDriveKinematics;
 
-
-import org.firstinspires.ftc.robotcore.external.Consumer;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantAsync;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantAsyncAndConstraints;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.autoCommands.LineToConstantAsyncAndTime;
@@ -27,18 +24,24 @@ public class Scheduler {
     Chassis f;
 
 
+
+
     boolean last= true, current= false, justDone= false;
-    LinkedList<Task> queue;
+    public LinkedList<Task> list;
+
     public Scheduler(){
-        queue= new LinkedList<>();
+        list = new LinkedList<>();
+
     }
-    public Scheduler(Chassis f){this.f =f; queue= new LinkedList<>(); }
+    public Scheduler(Chassis f){this.f =f; list = new LinkedList<>();
+
+    }
     public boolean done(){
-        return queue.isEmpty();
+        return list.isEmpty();
     }
     @Deprecated
     public int getQueueSize(){
-        return queue.size();
+        return list.size();
     }
 
     public Scheduler addChassis(Chassis chassis){
@@ -46,8 +49,11 @@ public class Scheduler {
         return this;
     }
 
+
+
+
     public Scheduler addTask(Task t){
-        queue.addLast(t);
+        list.addLast(t);
         return this;
     }
     public Scheduler addTask(InstantTask t){
@@ -55,7 +61,7 @@ public class Scheduler {
             t.run();
             return true;
         };
-        queue.addLast(task);
+        list.addLast(task);
         return this;
     }
     public interface InstantTask{
@@ -67,24 +73,47 @@ public class Scheduler {
     }
     public Scheduler waitSeconds(double sec){
 
-        queue.addLast(new Wait(sec));
+        list.addLast(new Wait(sec));
         return this;
     }
     @Deprecated
     public Scheduler waitSecondsFirst(double sec){
-        queue.addFirst(new Wait(sec));
+        list.addFirst(new Wait(sec));
         return this;
     }
 
     public void removeAllTasks(){
-        queue= new LinkedList<>();
+        list = new LinkedList<>();
     }
     @Deprecated
     public Scheduler addFirst(Task t){
-        queue.addFirst(t);
+        list.addFirst(t);
         return this;
     }
+    public Scheduler copy(){
+        Scheduler copy= new Scheduler();
+        for(Task t: list)
+            copy.addTask(t);
 
+        return copy;
+    }
+
+    public Task getAsTask(){
+        Task task;
+        class SchedulerAsTask implements Task{
+
+            Scheduler s;
+            public SchedulerAsTask(Scheduler s){
+                this.s= s.copy();
+            }
+            @Override
+            public boolean Run() {
+                s.update();
+                return s.done();
+            }
+        }
+        return new SchedulerAsTask(this);
+    }
     public void update(){
 
         if(done()) {
@@ -97,65 +126,65 @@ public class Scheduler {
         last= false;
 
 
-        Task t= queue.getFirst();
+        Task t= list.getFirst();
         boolean result= t.Run();
         if(result)
-            queue.removeFirst();
+            list.removeFirst();
 
     }
     public Scheduler tangentToConstantAsync(Pose p, double tValue)
     {
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new TangentToConstantAsync());
+        list.addLast(new TangentToConstantAsync());
         return this;
     }
     public Scheduler lineToLinearSync(Pose p){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new LineToLinearSync());
+        list.addLast(new LineToLinearSync());
         return this;
     }
     public Scheduler lineToLinearAsync(Pose p){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new LineToLinearAsync());
+        list.addLast(new LineToLinearAsync());
         return this;
     }
 
     public Scheduler lineToTangentialSync(Pose p){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new LineToTangentSync());
+        list.addLast(new LineToTangentSync());
         return this;
     }
     public Scheduler lineToTangentialAsync(Pose p){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new
+        list.addLast(new
                 LineToTangentAsync());
         return this;
     }public Scheduler lineToConstantSync(Pose p){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new LineToConstantSync(this.f, p));
+        list.addLast(new LineToConstantSync(this.f, p));
         return this;
     }public Scheduler lineToConstantAsync(Pose p){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new LineToConstantAsync(this.f, p));
+        list.addLast(new LineToConstantAsync(this.f, p));
         return this;
     }
     public Scheduler lineToConstantAsync(Pose p, double time){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new LineToConstantAsyncAndTime(this.f, p, time));
+        list.addLast(new LineToConstantAsyncAndTime(this.f, p, time));
         return this;
     }
     public Scheduler lineToConstantAsync(Pose p, double dist, double rad){
         if(f== null)
             throw new NullPointerException("baga Chassis in constructor");
-        queue.addLast(new LineToConstantAsyncAndConstraints(this.f, p, dist, rad));
+        list.addLast(new LineToConstantAsyncAndConstraints(this.f, p, dist, rad));
         return this;
     }
 

@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.temu_pedro.Constants;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Vector;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.slew_rate_limiter.GamepadLimiter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
@@ -48,8 +49,12 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         headingCorrection= 0;
         headingController= new PIDFController(0.01 , Constants.strafe.getI(), 0.001, Constants.strafe.getF());
 
+
+
+
     }
 
+    Vector leftFrontState, leftBackState, rightFrontState, rightBackState;
 
 
     public void initialize(Robot robot) {
@@ -125,6 +130,9 @@ public class SwerveDrivetrain implements DrivetrainInterface {
         }
 
 
+        public synchronized void setState(Vector v){
+            setState(v.getMagnitude(), v.getTheta());
+        }
 
 
         public synchronized void setState(double speed, double angle) {
@@ -355,6 +363,10 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                         c = strafeY + rotation * (trackWidth / radius),
                         d = strafeY - rotation * (trackWidth / radius);
 
+//                leftFrontState= new Vector(- hypot(b, c),MathStuff.normalizeRadians(atan2(b, c)- Math.toRadians(leftFrontOffset)), Vector.Type.POLAR);
+//                leftBackState= new Vector(-hypot(a,d), MathStuff.normalizeRadians(atan2(a,c) - Math.toRadians(leftBackOffset)), Vector.Type.POLAR);
+//                rightBackState= new Vector(hypot(a,c), MathStuff.normalizeRadians(atan2(a,d)- Math.toRadians(rightBackOffset)), Vector.Type.POLAR);
+//                rightFrontState= new Vector(hypot(a,d), MathStuff.normalizeRadians(atan2(b,d)- Math.toRadians(rightFrontOffset)), Vector.Type.POLAR);
 
                 double flSpeed = hypot(b, c),
                         frSpeed = hypot(b, d),
@@ -377,6 +389,7 @@ public class SwerveDrivetrain implements DrivetrainInterface {
                 frAngle= MathStuff.normalizeDegrees(toDegrees(frAngle)- rightFrontOffset);
                 blAngle= MathStuff.normalizeDegrees(toDegrees(blAngle)- leftBackOffset);
                 brAngle= MathStuff.normalizeDegrees(toDegrees(brAngle)- rightBackOffset);
+
 
 
                 fl.setState(-flSpeed, flAngle);

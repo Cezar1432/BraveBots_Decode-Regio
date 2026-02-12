@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LowPassFilter;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Vector;
 
 
 public class PinpointV1 implements Localizer {
@@ -121,14 +122,23 @@ public class PinpointV1 implements Localizer {
     public double heading, x, y, xVelocity, yVelocity;
     public void updateGlide(){
 
-        xRobotVelocity = xVelocity * Math.cos(-heading) - yVelocity * Math.sin(-heading);
-        yRobotVelocity = xVelocity * Math.sin(-heading) + yVelocity * Math.cos(-heading);
+        Vector robotVelocity= new Vector(xRobotVelocity, yRobotVelocity, Vector.Type.CARTESIAN);
+        robotVelocity= robotVelocity.rotateBy(-heading);
+//        xRobotVelocity = xVelocity * Math.cos(-heading) - yVelocity * Math.sin(-heading);
+//        yRobotVelocity = xVelocity * Math.sin(-heading) + yVelocity * Math.cos(-heading);
 
+        xRobotVelocity= robotVelocity.getXComponent();
+        yRobotVelocity= robotVelocity.getYComponent();
         forwardGlide = Math.signum(xRobotVelocity) * xRobotVelocity * xRobotVelocity / (2.0 * xDeceleration);
         lateralGlide = Math.signum(yRobotVelocity) * yRobotVelocity * yRobotVelocity / (2.0 * yDeceleration);
 
-        xGlide = forwardGlide * Math.cos(heading) - lateralGlide * Math.sin(heading);
-        yGlide = forwardGlide * Math.sin(heading) + lateralGlide * Math.cos(heading);
+        Vector glide= new Vector(forwardGlide, lateralGlide, Vector.Type.CARTESIAN);
+        glide= glide.rotateBy(heading);
+        xGlide= glide.getXComponent();
+        yGlide= glide.getYComponent();
+
+//        xGlide = forwardGlide * Math.cos(heading) - lateralGlide * Math.sin(heading);
+//        yGlide = forwardGlide * Math.sin(heading) + lateralGlide * Math.cos(heading);
     }
     public double predictedX, predictedY;
     public double getPredictedX(){

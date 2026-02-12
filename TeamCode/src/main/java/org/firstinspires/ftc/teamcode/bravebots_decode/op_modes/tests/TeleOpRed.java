@@ -121,22 +121,31 @@ public class TeleOpRed extends BetterOpMode {
         if(gamepadEx1.getButton(BetterGamepad.Buttons.TRIANGLE).wasPressed())
             opModeScheduler.addTask(new Spit());
 
+        robot.update();
+
         now= System.nanoTime();
         telemetry.addData("hz", 1e9/(now- last));
         //telemetry.addData("hz2", hz);
         telemetry.addData("hz3", hz2);
         telemetry.addData("turret state", Turret.getState());
 //        telemetry.addData("heading", robot.robotHeading);
-        telemetry.addData("x", Turret.x);
-        telemetry.addData("y", Turret.y);
-        telemetry.addData("turret angle", Turret.getAngle());
-        telemetry.addData("targetticks",Turret.targetTicks);
-        telemetry.addData("pos",Turret.getTicks()-Turret.ticksPerRevolution/2);
-        telemetry.addData("heading", LimelightMath.robotHeading);
-        telemetry.addData("shooting", Robot.shooting);
+        telemetry.addData("x", Robot.robotPose.getX());
+        telemetry.addData("y", Robot.robotPose.getY());
+        telemetry.addData("predicted x", Turret.x);
+        telemetry.addData("predicted y", Turret.y);
+        telemetry.addData("x corner", Turret.xCorner);
+        telemetry.addData("y corner", Turret.yCorner);
+        telemetry.addData("field relative", Turret.fieldRelative);
+        telemetry.addData("robot relative", Turret.robotRelative);
+        telemetry.addData("turret relative", Turret.turretRelative);
+        telemetry.addData("target ticks", Turret.targetTicks);
+//        telemetry.addData("turret angle", Turret.getAngle());
+//        telemetry.addData("targetticks",Turret.targetTicks);
+//        telemetry.addData("pos",Turret.getTicks()-Turret.ticksPerRevolution/2);
+//        telemetry.addData("heading", LimelightMath.robotHeading);
+//        telemetry.addData("shooting", Robot.shooting);
         telemetry.update();
         last= now;
-        robot.update();
         drive.write();
         Turret.write();
         Shooter.write();

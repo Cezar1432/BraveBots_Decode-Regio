@@ -38,7 +38,7 @@ public class BetterGamepad {
     public class Button{
         Buttons button;
         BooleanSupplier pressed;
-        Supplier<Task> t;
+        Supplier<Scheduler> s;
         public Button(Buttons button){
             this.button= button;
 
@@ -88,14 +88,14 @@ public class BetterGamepad {
                     break;
             }
         }
-        public void whenPressed(Task t){
-            this.t= ()-> t;
+        public void whenPressed(Scheduler s){
+            this.s= ()-> s;
         }
         public void whenPressed(Scheduler.InstantTask t){
-            this.t= ()->() -> {
-                t.run();
-                return true;
-            };
+            this.s= ()-> new Scheduler().addTask(t);
+        }
+        public void whenPressed(Task t){
+            this.s= ()-> new Scheduler().addTask(t);
         }
 
         public boolean wasPressed(){
@@ -121,9 +121,11 @@ public class BetterGamepad {
 
     public void update(){
         for(Button button: buttons){
-            if(button.t!= null){
-                if(button.wasPressed())
-                    scheduler.addTask(button.t.get());
+            if(button.s!= null){
+                if(button.wasPressed()) {
+                    Scheduler s= button.s.get();
+                    scheduler.addTask(s.getAsTask());
+                }
             }
         }
         scheduler.update();

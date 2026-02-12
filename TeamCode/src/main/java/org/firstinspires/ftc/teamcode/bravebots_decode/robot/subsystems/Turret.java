@@ -12,12 +12,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.bravebots_decode.op_modes.Alliance;
 import org.firstinspires.ftc.teamcode.bravebots_decode.robot.Robot;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LimelightMath;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.LowPassFilter;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.MathStuff;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.PDSFCoefficients;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Pose;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.math.Vector;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterCRServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
@@ -129,7 +132,7 @@ public class Turret {
     static boolean alignedByLimelight= false;
 
     public static double fieldRelative, robotRelative, turretRelative;
-    public static double x, y, xCorner, yCorner;
+    public static double x, y, xCorner, yCorner, heading;
     public static final double UPDATE_PERIOD= 700, PINPOINT_UPDATE_PERIOD = 2000;
     public static volatile boolean conditioneAllign= false;
     public static double position;
@@ -195,6 +198,8 @@ public class Turret {
     }
     public static final double /*ticksPerRevolution= 24272.6,*/ ticksPerRevolution=40960, ticksPerDegree= ticksPerRevolution/ 360.0;
     public static double targetTicks= 0,targetTicksTuning=0;
+    public static double launchTime= .5;
+    public static double predictedX, predictedY, xGlide, yGlide;
     public static double minTicks= -ticksPerDegree* 177, maxTicks= ticksPerRevolution*177;
     public synchronized static void update(){
 
@@ -266,43 +271,73 @@ public class Turret {
 
         if(state== State.TRACKING) {
 
-            try {
-                LLResult res = LimelightMath.getResults();
-                if (res != null && res.isValid()) {
-                    List<LLResultTypes.FiducialResult> fiducials = res.getFiducialResults();
-                    for (LLResultTypes.FiducialResult fiduci : fiducials) {
-                        int apriltagID = fiduci.getFiducialId();
-                        if ((Robot.a == Alliance.RED && apriltagID == 24) || (Robot.a == Alliance.BLUE && apriltagID == 20)) {
-                            allignedbylimelight = true;
-                            pose = res.getBotpose_MT2();
-                            positionll = pose.getPosition();
-                            if (positionll.x != 0 && positionll.y != 0) {
-                                Robot.odo.setPosX(positionll.y, DistanceUnit.METER);
-                                Robot.odo.setPosY(-positionll.x, DistanceUnit.METER);
-                            }
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-                android.util.Log.e("Turrret", e.getMessage(), e);
-            }
+//            try {
+//                LLResult res = LimelightMath.getResults();
+//                if (res != null && res.isValid()) {
+//                    List<LLResultTypes.FiducialResult> fiducials = res.getFiducialResults();
+//                    for (LLResultTypes.FiducialResult fiduci : fiducials) {
+//                        int apriltagID = fiduci.getFiducialId();
+//                        if ((Robot.a == Alliance.RED && apriltagID == 24) || (Robot.a == Alliance.BLUE && apriltagID == 20)) {
+//                            allignedbylimelight = true;
+//                            pose = res.getBotpose_MT2();
+//                            positionll = pose.getPosition();
+//                            if (positionll.x != 0 && positionll.y != 0) {
+//                                Robot.odo.setPosX(positionll.y, DistanceUnit.METER);
+//                                Robot.odo.setPosY(-positionll.x, DistanceUnit.METER);
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (Throwable e) {
+//                android.util.Log.e("Turrret", e.getMessage(), e);
+//            }
 
-            if (positionll != null && positionll.x != 0 && positionll.y != 0) {
-                y = positionll.y;
-                x = -positionll.x;
+            Pose robotPose= Robot.robotPose;
+            if (robotPose.getX() != 0 && robotPose.getY() != 0) {
 
-                yCorner = Robot.a == Alliance.RED ? FIELD_LENGTH / 2 - y : FIELD_LENGTH / 2 + y;
-                xCorner = FIELD_LENGTH / 2 - x;
+                x= robotPose.getX();
+                y= robotPose.getY();
+                heading= robotPose.getTheta();
 
+                double xVelocity= Robot.odo.getVelX(DistanceUnit.METER);
+                double yVelocity= Robot.odo.getVelY(DistanceUnit.METER);
+                double hVelocity= Robot.odo.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS);
+
+                x+= launchTime * xVelocity;
+                y+= launchTime * yVelocity;
+                heading= MathStuff.normalizeRadians(heading + launchTime * hVelocity);
+
+//                yCorner = Robot.a == Alliance.RED ? FIELD_LENGTH / 2 - y : FIELD_LENGTH / 2 + y;
+//                xCorner = FIELD_LENGTH / 2 - x;
+//                Vector robotVelocity= new Vector(xVelocity, yVelocity, Vector.Type.CARTESIAN).rotateBy(-heading);
+//                Vector predictedPoint= new Vector(x+ robotVelocity.getXComponent() * launchTime,
+//                                                    y+ robotVelocity.getYComponent() * launchTime,
+//                                                        Vector.Type.CARTESIAN).rotateBy(heading);
+//
+//
+//                Pose predictedPose= new Pose(predictedPoint.getXComponent(), predictedPoint.getYComponent(), MathStuff.normalizeRadians(heading + hVelocity * launchTime));
+//
+//
+//
+//
+//                x= predictedPose.getX();
+//                y= predictedPose.getY();
+//                heading= predictedPose.getTheta();
+
+
+
+                yCorner= FIELD_LENGTH- y;
+                xCorner= Robot.a== Alliance.RED ? FIELD_LENGTH- x : x;
                 dist = Math.hypot(xCorner, yCorner);
 
+                heading= Math.toDegrees(heading);
                 xCorner -= goalCircleRasius;
                 yCorner -= goalCircleRasius;
-                fieldRelative = Math.atan(xCorner / yCorner);
+                fieldRelative = Math.atan(yCorner / xCorner);
                 fieldRelative = Math.toDegrees(fieldRelative);
                 if (Robot.a == Alliance.BLUE)
                     fieldRelative = 180 - fieldRelative;
-                robotRelative = normalize(fieldRelative - Robot.odo.getHeading(AngleUnit.DEGREES));
+                robotRelative = normalize(fieldRelative - heading);
                 turretRelative = normalize(robotRelative - 180);
 
                 robotRelative = Robot.a == Alliance.RED ? robotRelative : -robotRelative;
