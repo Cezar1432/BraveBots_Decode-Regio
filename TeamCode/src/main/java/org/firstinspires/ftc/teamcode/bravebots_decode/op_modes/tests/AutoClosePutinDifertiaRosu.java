@@ -208,9 +208,14 @@ public class AutoClosePutinDifertiaRosu extends BetterOpMode {
         telemetry.addData("decision", decision);
         telemetry.addData("hood pos", Shooter.s.getPosition());
         last= now;
+        telemetry.addData("heading", c.localizer.heading);
+        telemetry.addData("x glide", c.localizer.xRobotVelocity);
+        telemetry.addData("forward glide", c.localizer.lateralGlide);
 //       // predicetedPose= c.localizer.getPredictedPose();
-//        // telemetry.addData("current x", c.localizer.getActualPose().getX());
-////        telemetry.addData("predicted x", predicetedPose.getX());
+         telemetry.addData("current x", c.localizer.getActualPose().getX());
+         telemetry.addData("current y", c.localizer.getActualPose().getY());
+         telemetry.addData("predicted x", c.getCurrentPosition().getY());
+         telemetry.addData("predicted y", c.getCurrentPosition().getY());
 //        // telemetry.addData("current y", c.localizer.getActualPose().getY());
 ////        telemetry.addData("predicted y",predicetedPose.getY());
 ////        telemetry.addData("current theta", c.getCurrentPosition().getTheta());
@@ -230,7 +235,7 @@ public class AutoClosePutinDifertiaRosu extends BetterOpMode {
 //        //telemetry.addData("TurretState",Turret.getState());
 //        //telemetry.addData("TurretTarget",Turret.targetTicks);
 //        //telemetry.addData("TurretDesiredDeegrees",Turret.degrees);
-//        telemetry.update();
+        telemetry.update();
         r.update();
         c.update();
         Spindexer.update();

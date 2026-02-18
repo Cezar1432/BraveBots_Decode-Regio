@@ -189,13 +189,11 @@ public class AutoClosePutinDiferitAlbastru extends BetterOpMode {
         telemetry.addData("TurretPos",Turret.getTicks());
         telemetry.addData("TurretState",Turret.getState());
         telemetry.addData("TurretTarget",Turret.targetTicks);
-        telemetry.addData("TurretDesiredDeegrees",Turret.degrees);
+        telemetry.addData("TurretDesiredDegrees",Turret.degrees);
         telemetry.addData("current x", c.getCurrentPosition().getX());
         telemetry.addData("current y", c.getCurrentPosition().getY());
         telemetry.addData("current theta", c.getCurrentPosition().getTheta());
-        telemetry.addData("heading", c.localizer.heading);
-        telemetry.addData("x glide", c.localizer.xRobotVelocity);
-        telemetry.addData("forward glide", c.localizer.lateralGlide);
+
         telemetry.update();
         //initIndexer.update();
 
