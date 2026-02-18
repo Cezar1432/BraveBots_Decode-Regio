@@ -114,16 +114,16 @@ public class PinpointV1 implements Localizer {
     }
 
 
-    public static double xRobotVelocity, yRobotVelocity;
-    public static double forwardGlide, lateralGlide;
-    public static double xGlide, yGlide;
+    public double xRobotVelocity, yRobotVelocity;
+    public double forwardGlide, lateralGlide;
 
 
     public double heading, x, y, xVelocity, yVelocity;
+    public Vector glide;
     public void updateGlide(){
 
-        Vector robotVelocity= new Vector(xRobotVelocity, yRobotVelocity, Vector.Type.CARTESIAN);
-        robotVelocity= robotVelocity.rotateBy(-heading);
+        Vector robotVelocity= new Vector(xRobotVelocity, yRobotVelocity, Vector.Type.CARTESIAN).rotateBy(-heading);
+
 //        xRobotVelocity = xVelocity * Math.cos(-heading) - yVelocity * Math.sin(-heading);
 //        yRobotVelocity = xVelocity * Math.sin(-heading) + yVelocity * Math.cos(-heading);
 
@@ -132,10 +132,9 @@ public class PinpointV1 implements Localizer {
         forwardGlide = Math.signum(xRobotVelocity) * xRobotVelocity * xRobotVelocity / (2.0 * xDeceleration);
         lateralGlide = Math.signum(yRobotVelocity) * yRobotVelocity * yRobotVelocity / (2.0 * yDeceleration);
 
-        Vector glide= new Vector(forwardGlide, lateralGlide, Vector.Type.CARTESIAN);
-        glide= glide.rotateBy(heading);
-        xGlide= glide.getXComponent();
-        yGlide= glide.getYComponent();
+        glide= new Vector(forwardGlide, lateralGlide, Vector.Type.CARTESIAN).rotateBy(heading);
+
+
 
 //        xGlide = forwardGlide * Math.cos(heading) - lateralGlide * Math.sin(heading);
 //        yGlide = forwardGlide * Math.sin(heading) + lateralGlide * Math.cos(heading);
@@ -179,8 +178,8 @@ public class PinpointV1 implements Localizer {
         xVelocity = xVelocityFilter.getValue(odo.getVelX(DistanceUnit.MM));
         yVelocity = yVelocityFilter.getValue(odo.getVelY(DistanceUnit.MM));
         updateGlide();
-        predictedX = x + xGlide;
-        predictedY = y + yGlide;
+        predictedX = x + glide.getXComponent();
+        predictedY = y + glide.getYComponent();
     }
 
 

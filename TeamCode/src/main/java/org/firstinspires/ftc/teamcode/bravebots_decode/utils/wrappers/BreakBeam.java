@@ -20,7 +20,7 @@ public class BreakBeam extends DigitalChannelImpl implements HardwareDevice {
         super(controller, channel);
     }
     public enum Status{
-        CLEAR, BROKEN;
+        CLEAR, BROKEN
     }
     Status status= Status.CLEAR;
     public boolean isBeamBroken(){
