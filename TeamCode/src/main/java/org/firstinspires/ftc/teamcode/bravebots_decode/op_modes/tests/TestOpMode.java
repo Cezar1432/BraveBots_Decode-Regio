@@ -135,8 +135,11 @@ public class TestOpMode extends BetterOpMode {
 //        telemetry.addData("pos",Turret.getTicks()-Turret.ticksPerRevolution/2);
 //        telemetry.addData("heading", LimelightMath.robotHeading);
 //        telemetry.addData("shooting", Robot.shooting);#
-        telemetry.addData("dist", Spindexer.colorSensor.getDistanceInCM());
+    //    telemetry.addData("dist", Spindexer.colorSensor.getDistanceInCM());
+//        telemetry.addData("culoare", Spindexer.colorSensor.getColorSeenBySensor());
+//        telemetry.addData("lasttime", Spindexer.lastTime);
         telemetry.addData("slot", Spindexer.currentSlot);
+        telemetry.addData("status", Spindexer.isBroken);
         telemetry.update();
         last= now;
         robot.update();
@@ -156,7 +159,6 @@ public class TestOpMode extends BetterOpMode {
         Spindexer.turnBack();
         Robot.shooting= false;
     }
-
     @Override
     public void end() {
         logicRunning= false;

@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.robot.subsystems;
 
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterColorSensor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.Colors;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +26,8 @@ public class Spindexer{
      }
 
      public enum Slots{
-         SLOT_1(0.4656,0), SLOT_2(.345,0), SLOT_3(.2217,0),EJECT1(0.38,0),EJECT2(0.5117,0),EJECT3(0.6233,0);
+         SLOT_1(0.4967,0), SLOT_2(.3739,0), SLOT_3(.2383  ,0),EJECT1(0.38,0),EJECT2(0.5117,0),EJECT3(0.6233,0);   //poz bune initiale
+       //  SLOT_1(0.4494,0), SLOT_2(.311,0), SLOT_3(.215,0),EJECT1(0.38,0),EJECT2(0.5117,0),EJECT3(0.6233,0);
       // SLOT_1(0.4656,0), SLOT_2(.345,0), SLOT_3(.2217,0),EJECT1(0.38,0),EJECT2(0.5117,0),EJECT3(0.6233,0);
 
          final double frontPose, shootPose;
@@ -50,7 +54,7 @@ public class Spindexer{
      }
 
      public static double minimumTime= 350;
-     static double lastTime= 0;
+     public static double lastTime= 0;
      public static Slots currentSlot= Slots.SLOT_1;
 
      public static void turnManuallyToRight(){
@@ -66,9 +70,11 @@ public class Spindexer{
      public static void setSorting(boolean set){
          sorting= set;
      }
-     public static boolean testBoolean;
+     public static boolean testBoolean, isBroken;
      public static BetterColorSensor colorSensor;
-     public static boolean inSlot= false;
+    public static DigitalChannel breakBeam;
+
+    public static boolean inSlot= false;
 
      public static double BallInDist= 10;
      public static void update(){
@@ -79,14 +85,14 @@ public class Spindexer{
              else{
                  double dist= colorSensor.getDistanceInCM();
                  testBoolean= dist< BallInDist;
-                 if(System.currentTimeMillis()- lastTime> minimumTime && testBoolean && currentSlot!= Slots.SLOT_3){
+                 isBroken = !breakBeam.getState();
+                 if(System.currentTimeMillis()- lastTime> minimumTime && isBroken && currentSlot!= Slots.SLOT_3){
 
                      lastTime= System.currentTimeMillis();
                      if(currentSlot== Slots.SLOT_1)
                          currentSlot= Slots.SLOT_2;
                      else if(currentSlot== Slots.SLOT_2)
                          currentSlot= Slots.SLOT_3;
-
 
                      turnTo(currentSlot);
                  }

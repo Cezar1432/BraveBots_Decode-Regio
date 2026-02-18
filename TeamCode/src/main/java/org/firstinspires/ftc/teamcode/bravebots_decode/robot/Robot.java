@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.bravebots_decode.robot;
 
 
-import android.graphics.Path;
-
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -11,8 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
+import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -53,6 +53,9 @@ public class Robot {
     public volatile BetterCRServo fl, bl, fr, br;
     public BetterServo indexer1, indexer2;
     public EvenBetterServo hood;
+
+    public DigitalChannel breakBeam;
+    public DigitalChannelController controller;
     public AnalogInputController expansionHubAnalogInputController, controlHubAnalogInputController;
     public static Alliance a= null;
     BetterColorSensor colorSensor;
@@ -60,6 +63,7 @@ public class Robot {
     public Telemetry t;
     List<LynxModule> hubs;
     LynxModule controlHub, expansionHub;
+
     OpenCvCamera camera;
     public Limelight3A ll;
     static Robot instance;
@@ -82,7 +86,6 @@ public class Robot {
 
 
     public void initializeControllers(){
-
         controlHubMotors= hm.get(DcMotorController.class, "Control Hub");
         expansionHubMotors= hm.get(DcMotorController.class, "Expansion Hub 2");
         controlHubServos= hm.get(ServoController.class, "Control Hub");
@@ -90,8 +93,7 @@ public class Robot {
         controlHubAnalogInputController= hm.get(AnalogInputController.class, "Control Hub");
         expansionHubAnalogInputController= hm.get(AnalogInputController.class, "Expansion Hub 2");
         exExpansionHubMotors= hm.get(DcMotorControllerEx.class, "Expansion Hub 2");
-
-
+        controller = hm.get(DigitalChannelController.class, "Control Hub");
     }
     public void initializeMotors(){
 
@@ -121,6 +123,7 @@ public class Robot {
         Spindexer.colorSensor= colorSensor;
         Turret.m= turret;
         LimelightMath.ll = ll;
+        Spindexer.breakBeam = breakBeam;
         LimelightMath.robot= this;
 
     }
@@ -145,6 +148,7 @@ public class Robot {
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         colorSensor= hm.get(BetterColorSensor.class, "color sensor");
+        breakBeam = hm.get(DigitalChannel.class, "breakBeam");
 
 
         ll= hm.get(Limelight3A.class, "ll");

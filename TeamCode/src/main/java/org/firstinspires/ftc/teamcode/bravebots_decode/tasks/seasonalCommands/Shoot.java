@@ -23,8 +23,7 @@ public class Shoot implements Task {
                     Spindexer.turnTo(Spindexer.Slots.SLOT_3);
                     Intake.start();
                     //Turret.setState(Turret.State.TRACKING);
-                })
-                .addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(Shooter.vel))< Shooter.velocityThreshold)
+                }).addTask(()->Math.abs(Math.abs(Shooter.motor1.getVelocity())- Math.abs(Shooter.vel))< Shooter.velocityThreshold)
                 .addTask(Spindexer::shootRandom)
                 .waitSeconds(waitTime)
                 .addTask(()->Shooter.s.setPosition(Shooter.HoodPos+increment))
