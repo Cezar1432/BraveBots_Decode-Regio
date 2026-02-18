@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import org.firstinspires.ftc.teamcode.bravebots_decode.tasks.commandBased.base.Scheduler;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterColorSensor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BreakBeam;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.Colors;
 
 import java.util.LinkedList;
@@ -70,9 +71,11 @@ public class Spindexer{
      public static void setSorting(boolean set){
          sorting= set;
      }
-     public static boolean testBoolean, isBroken;
+     public static boolean testBoolean;
+
+     public static BreakBeam.Status beamState;
      public static BetterColorSensor colorSensor;
-    public static DigitalChannel breakBeam;
+    public static BreakBeam breakBeam;
 
     public static boolean inSlot= false;
 
@@ -85,16 +88,15 @@ public class Spindexer{
              else{
                  double dist= colorSensor.getDistanceInCM();
                  testBoolean= dist< BallInDist;
-                 isBroken = !breakBeam.getState();
-                 if(System.currentTimeMillis()- lastTime> minimumTime && isBroken && currentSlot!= Slots.SLOT_3){
+                 beamState = breakBeam.getBeamState();
+                 if(System.currentTimeMillis() - lastTime > minimumTime && beamState.equals(BreakBeam.Status.BROKEN) && currentSlot != Slots.SLOT_3){
 
                      lastTime= System.currentTimeMillis();
                      if(currentSlot== Slots.SLOT_1)
-                         currentSlot= Slots.SLOT_2;
+                         turnTo(Slots.SLOT_2);
                      else if(currentSlot== Slots.SLOT_2)
-                         currentSlot= Slots.SLOT_3;
+                         turnTo(Slots.SLOT_3);
 
-                     turnTo(currentSlot);
                  }
              }
          }

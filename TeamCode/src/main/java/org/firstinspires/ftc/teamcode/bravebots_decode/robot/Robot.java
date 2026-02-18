@@ -33,6 +33,7 @@ import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterColo
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotor;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterMotorEx;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BetterServo;
+import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.BreakBeam;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.EvenBetterServo;
 import org.firstinspires.ftc.teamcode.bravebots_decode.utils.wrappers.LazyPinpoint;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -54,7 +55,9 @@ public class Robot {
     public BetterServo indexer1, indexer2;
     public EvenBetterServo hood;
 
-    public DigitalChannel breakBeam;
+    public BreakBeam breakBeam;
+
+
     public DigitalChannelController controller;
     public AnalogInputController expansionHubAnalogInputController, controlHubAnalogInputController;
     public static Alliance a= null;
@@ -148,7 +151,7 @@ public class Robot {
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         colorSensor= hm.get(BetterColorSensor.class, "color sensor");
-        breakBeam = hm.get(DigitalChannel.class, "breakBeam");
+        breakBeam= new BreakBeam(controller, 0);
 
 
         ll= hm.get(Limelight3A.class, "ll");
