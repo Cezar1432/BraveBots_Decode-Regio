@@ -175,8 +175,8 @@ public class PinpointV1 implements Localizer {
          x= currentPose.getX();
          y= currentPose.getY();
          heading= currentPose.getTheta();
-        xVelocity = xVelocityFilter.getValue(odo.getVelX(DistanceUnit.MM));
-        yVelocity = yVelocityFilter.getValue(odo.getVelY(DistanceUnit.MM));
+        xVelocity = xVelocityFilter.getValue(odo.getVelX(DistanceUnit.INCH));
+        yVelocity = yVelocityFilter.getValue(odo.getVelY(DistanceUnit.INCH));
         updateGlide();
         predictedX = x + glide.getXComponent();
         predictedY = y + glide.getYComponent();
