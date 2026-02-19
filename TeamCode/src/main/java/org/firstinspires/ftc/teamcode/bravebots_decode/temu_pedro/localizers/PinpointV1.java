@@ -122,7 +122,7 @@ public class PinpointV1 implements Localizer {
     public Vector glide;
     public void updateGlide(){
 
-        Vector robotVelocity= new Vector(xRobotVelocity, yRobotVelocity, Vector.Type.CARTESIAN).rotateBy(-heading);
+        Vector robotVelocity= new Vector(xVelocity, yVelocity, Vector.Type.CARTESIAN).rotateBy(-heading);
 
 //        xRobotVelocity = xVelocity * Math.cos(-heading) - yVelocity * Math.sin(-heading);
 //        yRobotVelocity = xVelocity * Math.sin(-heading) + yVelocity * Math.cos(-heading);

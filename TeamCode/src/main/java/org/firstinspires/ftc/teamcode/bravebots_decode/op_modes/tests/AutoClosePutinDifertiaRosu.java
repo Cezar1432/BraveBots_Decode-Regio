@@ -214,7 +214,7 @@ public class AutoClosePutinDifertiaRosu extends BetterOpMode {
 //       // predicetedPose= c.localizer.getPredictedPose();
          telemetry.addData("current x", c.localizer.getActualPose().getX());
          telemetry.addData("current y", c.localizer.getActualPose().getY());
-         telemetry.addData("predicted x", c.getCurrentPosition().getY());
+         telemetry.addData("predicted x", c.getCurrentPosition().getX());
          telemetry.addData("predicted y", c.getCurrentPosition().getY());
 //        // telemetry.addData("current y", c.localizer.getActualPose().getY());
 ////        telemetry.addData("predicted y",predicetedPose.getY());
